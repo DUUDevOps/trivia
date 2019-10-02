@@ -10,5 +10,5 @@ var config = {
     measurementId: "G-SJ6TD2BJRW"
 };
 
-var fb = firebase.initializeApp(config);
-export default fb;
+firebase.initializeApp(config);
+export default firebase;
