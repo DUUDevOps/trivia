@@ -7,12 +7,15 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Firebase, { FirebaseContext } from './components/Firebase/firebase';
 
 import HomePage from './containers/HomePage';
+import RegisterPage from './containers/client/RegisterPage';
 
 ReactDOM.render(
   <FirebaseContext.Provider value={new Firebase()}>
     <BrowserRouter>
       <Switch>
         <Route exact path="/" component={HomePage} />
+        <Route exact path="/play/register" component={RegisterPage} />
+        <Route component={HomePage} />
       </Switch>
     </BrowserRouter>
   </FirebaseContext.Provider>,
