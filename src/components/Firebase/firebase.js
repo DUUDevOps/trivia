@@ -1,4 +1,6 @@
 import firebase from 'firebase';
+import React from 'react';
+
 var config = {
 	apiKey: process.env.FIREBASE_API_KEY,
     authDomain: "devops-trivia-18a2c.firebaseapp.com",
@@ -10,5 +12,14 @@ var config = {
     measurementId: "G-SJ6TD2BJRW"
 };
 
-var fb = firebase.initializeApp(config);
-export default fb;
+class Firebase {
+    constructor() {
+        firebase.initializeApp(config)
+    }
+}
+
+const FirebaseContext = React.createContext(null);
+
+export default Firebase;
+
+export { FirebaseContext };
