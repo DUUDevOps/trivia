@@ -6,11 +6,9 @@ import firebase from '../../firebase';
 class AppSide extends Component {
   constructor() {
     super();
-    this.state = {
-      //Holds the value of the current answer
-      currentAns: "",         
+    this.state = {  
       //An array of the all the answers in a round (This is packaged and sent to Firebase after submit)
-      ansArray: []
+      ansArray: [10] //I think it's 10 questions for the rounds
     }
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -41,7 +39,7 @@ onSubmit(e) {
   
   //Clear inputs to enable next input
   this.setState({
-    currentAns: ""
+    ansArray: [10]
   });
 }
 
