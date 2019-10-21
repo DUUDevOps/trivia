@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import './Admin.css';
 import firebase from '../../firebase';
 //Need to write out the handleChange and handleSubmit methods
+//idea have two arrays, one for Qs and one for A's?
 class Admin extends Component {
   constructor() {
     super();
     this.state = {
       QA: []
+      //Q: []
+      //A: []
     }
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -24,8 +27,8 @@ class Admin extends Component {
     e.preventDefault();
     const itemsRef = firebase.database().ref('items');
     const item = {
-      title: this.state.currentItem,
-      user: this.state.username
+      question: this.state.question,
+      answer: this.state.answer
     }
     itemsRef.push(item);
     this.setState({
