@@ -18,7 +18,20 @@ class LoginContainer extends React.Component {
       email: '',
       password:'',
     };
+
+    this.firebase = props.firebase;
+    this.onSubmit = this.onSubmit.bind(this);
   }
+
+  onSubmit() {
+    this.firebase.signInWithEmail(this.state.email, this.state.password, (error) => {
+      if (error) {
+        console.log("Error"); // TODO: better error handling here
+      } else {
+        this.props.history.push("/admin/create");
+      }
+    });
+  } 
 
   render() {
     return (
@@ -49,6 +62,11 @@ class LoginContainer extends React.Component {
               onChange={(e) => this.setState({ password: e.target.value })}
               width="80%"
             />
+          </div>
+        </div>
+        <div className={styles.buttonContainer}>
+          <div className={styles.button} role="button" onClick={(e) => this.onSubmit()}>
+            login
           </div>
         </div>
       </div>
