@@ -19,7 +19,7 @@ class Firebase {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
   }
-
+ 
   signInWithEmail = (email, password, callback) => {
     if (email !== DUU_ADMIN_USERNAME) {
       callback({
