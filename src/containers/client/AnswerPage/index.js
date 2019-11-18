@@ -58,15 +58,15 @@ class AnswerPage extends Component {
       <div className='app'>
         <header>
             <div className="wrapper">
-              <h1>Fun Food Friends</h1>
+              <h1>Answer Page</h1>
                              
             </div>
         </header>
         <div className='container'>
           <section className='add-item'>
                 <form onSubmit={this.handleSubmit}>
-                  <input type="text" name="username" placeholder="What's your name?" onChange={this.handleChange} value={this.state.username} />
-                  <input type="text" name="currentItem" placeholder="What are you bringing?" onChange={this.handleChange} value={this.state.currentItem} />
+                  <input type="text" name="username" placeholder="Answer" onChange={this.handleChange} value={this.state.username} />
+                  <input type="text" name="currentItem" placeholder="Answer 2" onChange={this.handleChange} value={this.state.currentItem} />
                   <button>Add Item</button>
                 </form>
           </section>
