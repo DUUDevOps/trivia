@@ -7,7 +7,8 @@ const NUM_QUESTIONS = 10;
 
 class CreateQuizPage extends React.Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
 
     var defaultQA = [];
     for (let i = 0; i < NUM_QUESTIONS; i += 1) {
