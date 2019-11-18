@@ -12,31 +12,31 @@ var config = {
   measurementId: "G-SJ6TD2BJRW"
 };
 
-// const DUU_ADMIN_USERNAME = "duu-admin";
+const DUU_ADMIN_USERNAME = "duu-admin";
 
 class Firebase {
   constructor() {
     firebase.initializeApp(config);
-    // this.auth = firebase.auth();
+    this.auth = firebase.auth();
   }
  
-  // signInWithEmail = (email, password, callback) => {
-  //   if (email !== DUU_ADMIN_USERNAME) {
-  //     callback({
-  //       message: "Incorrect Admin Account",
-  //       status: 500,
-  //     });
-  //   }
+  signInWithEmail = (email, password, callback) => {
+    if (email !== DUU_ADMIN_USERNAME) {
+      callback({
+        message: "Incorrect Admin Account",
+        status: 500,
+      });
+    }
 
-  //   this.auth.signInWithEmailAndPassword(email, password)
-  //     .then(() => callback(null))
-  //     .catch((error) => {
-  //       callback({
-  //         message: error.message,
-  //         status: 500
-  //       });
-  //     });
-  // };
+    this.auth.signInWithEmailAndPassword(email, password)
+      .then(() => callback(null))
+      .catch((error) => {
+        callback({
+          message: error.message,
+          status: 500
+        });
+      });
+  };
 }
 
 const FirebaseContext = React.createContext(null);
