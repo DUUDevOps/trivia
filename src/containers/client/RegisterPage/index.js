@@ -1,5 +1,6 @@
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 
 import styles from './styles.module.css';
@@ -71,7 +72,9 @@ class RegisterPage extends React.Component {
         </div>
 
         <div className={styles.next}>
-          next
+          <Link className={styles.button} to="/play/register/answer">
+              next
+          </Link>
           <i className={classNames('fas fa-arrow-right', styles.arrow)} />
         </div>
       </div>

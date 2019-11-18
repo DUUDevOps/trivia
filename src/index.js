@@ -11,6 +11,7 @@ import RegisterPage from './containers/client/RegisterPage';
 import LoginPage from './containers/admin/LoginPage';
 import HostQuestionPage from './containers/admin/HostQuestionPage';
 import CreateQuizPage from './containers/admin/CreateQuizPage';
+import AnswerPage from './containers/client/AnswerPage';
 
 ReactDOM.render(
   <FirebaseContext.Provider value={new Firebase()}>
@@ -18,6 +19,7 @@ ReactDOM.render(
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route exact path="/play/register" component={RegisterPage} />
+        <Route exact path="/play/register/answer" component={AnswerPage} />
         <Route exact path="/admin/login" component={LoginPage} />
         <Route exact path="/host/question/:qnum" component={HostQuestionPage} />
         <Route exact path="/admin/create" component={CreateQuizPage} />
