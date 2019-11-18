@@ -2,7 +2,7 @@ import firebase from 'firebase';
 import React from 'react';
 
 var config = {
-	apiKey: process.env.FIREBASE_API_KEY,
+	apiKey: "AIzaSyAwyhl8Pi7drd3ls6bSaxWTYx3LnyyO7_Q",
   authDomain: "devops-trivia-18a2c.firebaseapp.com",
   databaseURL: "https://devops-trivia-18a2c.firebaseio.com",
   projectId: "devops-trivia-18a2c",
@@ -12,7 +12,9 @@ var config = {
   measurementId: "G-SJ6TD2BJRW"
 };
 
-const DUU_ADMIN_USERNAME = "duu-admin";
+const DUU_ADMIN_USERNAME = "dukeatnite@gmail.com";
+const QUIZ_REF_NAME = "quizzes";
+const NUM_QUESTIONS = 10;
 
 class Firebase {
   constructor() {
@@ -36,6 +38,22 @@ class Firebase {
           status: 500
         });
       });
+  };
+
+  saveQuizFromAdmin = (quiz, callback) => {
+    let quizzesRef = firebase.database().ref(QUIZ_REF_NAME);
+    let newQuizRef = quizzesRef.child('' + this.getCurrentFormattedDate());
+
+    quiz.forEach(QASet => {
+      newQuizRef.push().set(QASet);
+    });
+
+    callback();
+  };
+
+  getCurrentFormattedDate = () => {
+    // this will return the date in yyyy-mm-dd
+    return new Date().toISOString().slice(0, 10);
   };
 }
 
