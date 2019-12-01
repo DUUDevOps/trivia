@@ -52,15 +52,15 @@ class Firebase {
   };
 
   /**
-   * @param {number} team
+   * @param {number} teamNumber
    * @param {array} answers
    * @param {function} callback
    */
-  saveAnswersForTeam = (team, answers, callback) => {
+  saveAnswersForTeam = (teamNumber, answers, callback) => {
     let teamRef = firebase.database().ref()
       .child(this.getCurrentFormattedDate())
       .child('teams')
-      .child(String(teamNumber));
+      .child(teamNumber);
 
     answers.forEach((answer, index) => {
       teamRef.child(index).set(answer);
@@ -77,7 +77,7 @@ class Firebase {
     let teamRef = firebase.database().ref()
       .child(this.getCurrentFormattedDate())
       .child('teams')
-      .child(String(teamNumber));
+      .child(teamNumber);
 
     teamRef.once('value')
       .then(snapshot => {
