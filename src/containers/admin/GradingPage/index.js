@@ -4,6 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import classNames from 'classnames';
 
 // import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
+import firebase, { withFirebase } from '../../../components/Firebase/firebase';
 import styles from './styles.module.css';
 
 class GradingPage extends React.Component {
@@ -12,72 +13,33 @@ class GradingPage extends React.Component {
 
     this.state = {
       numTeams: 7,
-      questions: [
-        {
-          text: 'Who was the 1st pick in the 2019 NBA Draft?',
-          img: 'https://www.pinclipart.com/picdir/big/195-1958645_pelicans-playoff-moments-new-orleans-pelicans-clipart.png',
-          ans: 'Zion Williamson',
-        }, {
-          text: '2 + 2 = ?',
-          img: '',
-          ans: '4',
-        }, {
-          text: '2 + 2 = ?',
-          img: 'https://www.usnews.com/dims4/USNEWS/1a50cbb/2147483647/thumbnail/640x420/quality/85/?url=http%3A%2F%2Fcom-usnews-beam-media.s3.amazonaws.com%2F85%2Ff1%2F19f0ed814815ade2f68071bc3164%2F190610-geometryshapes-stock.jpg',
-          ans: 'Four',
-        }, {
-          text: 'This question will be overwhelmingly long to make sure that we can fit questions even when they are longer than any reasonable person would make them. I guess it will not be too long to keep it realistic, but still...',
-          img: '',
-          ans: 'An overwhelmingly long answer that may be correct but is way more than we need',
-        }, {
-          text: 'This question will be overwhelmingly long (with a picture) to make sure that we can fit questions even when they are longer than any reasonable person would make them. I guess it will not be too long to keep it realistic, but still...',
-          img: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/American_Beaver.jpg',
-          ans: 'Kind of long, but not too long',
-        }, {
-          text: 'Back to normal sized questions, I guess?',
-          img: '',
-          ans: 'Normal Answer',
-        }, {
-          text: 'Who is the oldest quarterback to ever win a Super Bowl?',
-          img: '',
-          ans: 'Tom Brady',
-        }, {
-          text: 'This question will be overwhelmingly long (with a picture) to make sure that we can fit questions even when they are longer than any reasonable person would make them. I guess it will not be too long to keep it realistic, but still...',
-          img: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/American_Beaver.jpg',
-          ans: 'Kind of long, but not too long',
-        }, {
-          text: 'Back to normal sized questions, I guess?',
-          img: '',
-          ans: 'Normal Answer',
-        }, {
-          text: 'Who is the oldest quarterback to ever win a Super Bowl?',
-          img: '',
-          ans: 'Tom Brady',
-        },
-      ],
-      answers: [
-        'zion',
-        'four',
-        '4',
-        'a very long answer for no reason, I doubt these will be limited in length, so it could happen',
-        'i am not sure',
-        'Normal Answer',
-        'Lebron James',
-        'i am not sure',
-        'Normal Answer',
-        'Lebron James',
-      ],
+      questions: [],
+      answers: [],
       corrects: [],
       showQuestion: -1,
     };
+
+    this.team = parseInt(this.props.match.params.team);
+
+    this.firebase = props.firebase;
+
+    this.firebase.getAnswersForTeam(this.team, answers => {
+      this.setState({ answers });
+    });
+
+    // TODO(dpowers): change this from a constant
+    this.firebase.getQuestionsAndCorrectAnswers(questions => {
+      this.setState({ questions });
+    });
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.match.params.team === this.props.match.params.team) {
       return;
     }
+
     this.setState({
-      corrects: [false,false,false,false,false,false,false,false,false,false],
+      correctAnswers: [false, false, false, false, false, false, false, false, false, false]
     });
   }
 
@@ -92,12 +54,10 @@ class GradingPage extends React.Component {
       return <Redirect to="/admin/login" />;
     }
 
-    const team = parseInt(this.props.match.params.team);
-
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          {`team ${team}`}
+          {`team ${this.team}`}
         </div>
 
         <div className={styles.headerContainer}>
@@ -123,9 +83,9 @@ class GradingPage extends React.Component {
                 </div>
 
                 <div className={styles.answer}>
-                  {q.ans}
+                  {q.answer}
                 </div>
-                <div className={styles.answer} style={{ marginLeft: '5vw' }}>
+                <div classsName={styles.answer} style={{ marginLeft: '5vw' }}>
                   {this.state.answers[i]}
                 </div>
 
@@ -154,10 +114,10 @@ class GradingPage extends React.Component {
 
         <Link
           className={styles.nextButton}
-          to={team === this.state.numTeams ? '/admin' : `/admin/grading/${team + 1}`}
+          to={this.team === this.state.numTeams ? '/admin' : `/admin/grading/${this.team + 1}`}
           style={{ right: '3vw', bottom: '3vh' }}
         >
-          {team === this.state.numTeams ? 'finish' : 'next'}
+          {this.team === this.state.numTeams ? 'finish' : 'next'}
           <i className={classNames('fas fa-arrow-right', styles.arrow)} />
         </Link>
 
@@ -183,4 +143,4 @@ GradingPage.propTypes = {
   match: PropTypes.object,
 };
 
-export default GradingPage;
+export default withFirebase(GradingPage);

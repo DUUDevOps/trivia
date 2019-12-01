@@ -23,7 +23,7 @@ class LoginContainer extends React.Component {
         if (error) {
           console.log("Error"); // TODO: better error handling here
         } else {
-          this.props.history.push("/admin/create");
+          this.props.history.push("/admin/grading/1");
         }
       });
     } 
