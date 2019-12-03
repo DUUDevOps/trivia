@@ -2,7 +2,7 @@ import firebase from 'firebase';
 import React from 'react';
 
 var config = {
-	apiKey: process.env.FIREBASE_API_KEY,
+	apiKey: "AIzaSyAwyhl8Pi7drd3ls6bSaxWTYx3LnyyO7_Q",
   authDomain: "devops-trivia-18a2c.firebaseapp.com",
   databaseURL: "https://devops-trivia-18a2c.firebaseio.com",
   projectId: "devops-trivia-18a2c",

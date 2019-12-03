@@ -17,6 +17,7 @@ ReactDOM.render(
         <Route exact path="/" component={HomePage} />
         <Route exact path="/play/register" component={RegisterPage} />
         <Route exact path="/admin/login" component={LoginPage} />
+        <Route exact path="/admin/create-quiz" component={CreateQuizPage} />
         <Route component={HomePage} />
       </Switch>
     </BrowserRouter>

@@ -2,50 +2,60 @@ import React, { Component } from 'react';
 import './create-quiz.css';
 //import firebase from '../../firebase';
 import firebase from '../../../components/Firebase/firebase'
+import styles from '../../client/RegisterPage/styles.module.css';
+import TextInput from '../../../components/TextInput';
 //Need to write out the handleChange and handleSubmit methods
 //idea have two arrays, one for Qs and one for A's?
-class Admin extends Component {
-  constructor() {
-    super();
+
+const NUM_QUES = 10
+//need to change for bonus?
+
+class CreateQuizPage extends Component {
+  constructor(props) {
+    super(props);
+
     this.state = {
-      QA: []
-      //Q: []
-      //A: []
+      ques: [''],
+      ans: [''],
+      media: [''],
     }
-    this.handleChange = this.handleChange.bind(this);
+
+
+    this.ChangeId = this.ChangeId.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   //handleChange = index => event => {
   //incomplete
-  handleChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
+  handleChange(e, index) {
+    const ques = [...this.state.ques];
+    ques[index] = e.target.value;
+    const ans = [...this.state.ans];
+    ans[index] = e.target.value;
+    const media = [...this.state.media];
+    media[index] = e.target.value;
+
+    this.setState({ques, ans, media})
   }
   //work in progress
   handleSubmit(e) {
     e.preventDefault();
     const itemsRef = firebase.database().ref('items');
     const item = {
-      question: this.state.question,
-      answer: this.state.answer
+      question: this.state.ques,
+      answer: this.state.ans,
     }
     itemsRef.push(item);
-    this.setState({
-      currentItem: '',
-      username: ''
-    });
   }
 
   render() {
     return (
-      <div className="admin">
+      <div className={styles.container}>
         <h1>Welcome to Trivia</h1>
         <div className="container">
           <p>Please enter your questions and answers here</p>
         </div>
-        <div className='container'>
+        <div className={styles.inputContainer}>
           <form onSubmit = {this.handleSubmit}>
           <table>
             <tr>
@@ -101,4 +111,4 @@ class Admin extends Component {
   }
 };
 
-export default Admin;
+export default CreateQuizPage;

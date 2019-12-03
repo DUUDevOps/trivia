@@ -24,7 +24,8 @@ class HomePage extends React.Component {
             <Link className={styles.button} to="/play/register">
               play
             </Link>
-            <Link className={styles.button} to="/admin/login">
+            //<Link className={styles.button} to="/admin/login">
+            <Link className={styles.button} to="/admin/create-quiz">
               login
             </Link>
           </div>
