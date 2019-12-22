@@ -85,7 +85,7 @@ class GradingPage extends React.Component {
                 <div className={styles.answer}>
                   {q.answer}
                 </div>
-                <div classsName={styles.answer} style={{ marginLeft: '5vw' }}>
+                <div className={styles.answer} style={{ marginLeft: '5vw' }}>
                   {this.state.answers[i]}
                 </div>
 

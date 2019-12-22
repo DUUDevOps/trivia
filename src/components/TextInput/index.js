@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 
 import styles from './styles.module.css';
 
-const TextInput = ({ placeholder, onChange, autoFocus, value, width }) => {
+const TextInput = ({ placeholder, onChange, autoFocus, value, width, type }) => {
   return (
     <input
       className={styles.input}
-      style={{ width }}
+      style={{ width: `calc(${width} - 20px)` }}
       placeholder={placeholder}
       onChange={onChange}
-      type="text"
+      type={type || 'text'}
       autoFocus={autoFocus ? 'autofocus' : ''}
       value={value}
     />
@@ -25,6 +25,7 @@ TextInput.propTypes = {
   autoFocus: PropTypes.bool,
   value: PropTypes.any,
   width: PropTypes.string,
+  type: PropTypes.string,
 };
 
 export default TextInput;

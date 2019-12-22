@@ -2,14 +2,14 @@ import firebase from 'firebase';
 import React from 'react';
 
 const config = {
-  apiKey: "AIzaSyAwyhl8Pi7drd3ls6bSaxWTYx3LnyyO7_Q",
-  authDomain: "devops-trivia-18a2c.firebaseapp.com",
-  databaseURL: "https://devops-trivia-18a2c.firebaseio.com",
-  projectId: "devops-trivia-18a2c",
-  storageBucket: "devops-trivia-18a2c.appspot.com",
-  messagingSenderId: "701353522538",
-  appId: "1:701353522538:web:e621e9c40ab4fbf2dee113",
-  measurementId: "G-SJ6TD2BJRW"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: "duu-trivia.firebaseapp.com",
+  databaseURL: "https://duu-trivia.firebaseio.com",
+  projectId: "duu-trivia",
+  storageBucket: "duu-trivia.appspot.com",
+  messagingSenderId: "503528390951",
+  appId: "1:503528390951:web:691b0e36f43d7209706902",
+  measurementId: "G-L05CNT2ZWP"
 };
 
 const ADMIN_REF_NAME = "quizzes";
@@ -20,17 +20,19 @@ class Firebase {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
   }
- 
+
   /**
    * @param {string} email
    * @param {string} password
    * @param {function} callback
    */
-  signInWithEmail = (email, password, callback) => {
+  signInWithEmail = (email, password, cb) => {
     this.auth.signInWithEmailAndPassword(email, password)
-      .then(() => callback(null))
-      .catch((error) => {
-        console.log(error);
+      .then((res) => {
+        cb({ success: true });
+      })
+      .catch((err) => {
+        cb({ success: false, msg: err.message })
       });
   };
 
