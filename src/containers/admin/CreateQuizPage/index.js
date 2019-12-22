@@ -2,17 +2,11 @@ import React from 'react';
 
 import styles from '../../client/RegisterPage/styles.module.css';
 import TextInput from '../../../components/TextInput';
-import { FirebaseContext } from '../../../components/Firebase/firebase';
+import { withFirebase } from '../../../components/Firebase/firebase';
 
 const NUM_QUESTIONS = 10;
 
-const CreateQuizPage = () => (
-  <FirebaseContext.Consumer>
-    {firebase => <CreateQuizContainer firebase={firebase} />}
-  </FirebaseContext.Consumer>
-);
-
-class CreateQuizContainer extends React.Component {
+class CreateQuizPage extends React.Component {
 
   constructor(props) {
     super(props);
@@ -26,7 +20,7 @@ class CreateQuizContainer extends React.Component {
 
     this.state = {
       questionsAndAnswers: defaultQA,
-    }
+    };
 
     this.firebase = props.firebase;
 
@@ -42,4 +36,4 @@ class CreateQuizContainer extends React.Component {
   }
 }
 
-export default CreateQuizPage;
+export default withFirebase(CreateQuizPage);
