@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import classNames from 'classnames';
 
 // import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
-import firebase, { withFirebase } from '../../../components/Firebase/firebase';
+import { withFirebase } from '../../../components/Firebase/firebase';
 import styles from './styles.module.css';
 
 class GradingPage extends React.Component {

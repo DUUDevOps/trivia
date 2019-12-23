@@ -12,8 +12,8 @@ const config = {
   measurementId: "G-L05CNT2ZWP"
 };
 
-const ADMIN_REF_NAME = "quizzes";
-const NUM_QUESTIONS = 10;
+// const ADMIN_REF_NAME = "quizzes";
+// const NUM_QUESTIONS = 10;
 
 class Firebase {
   constructor() {
@@ -29,7 +29,7 @@ class Firebase {
   signInWithEmail = (email, password, cb) => {
     this.auth.signInWithEmailAndPassword(email, password)
       .then((res) => {
-        cb({ success: true });
+        cb({ success: true, msg: email });
       })
       .catch((err) => {
         cb({ success: false, msg: err.message })

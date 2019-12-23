@@ -1,11 +1,13 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import jwt from 'jsonwebtoken';
 
 import styles from './styles.module.css';
 import { withFirebase } from '../../../components/Firebase/firebase';
 import TextInput from '../../../components/TextInput';
 import Loader from '../../../components/Loader';
+import { isAuth } from '../../../tools/helpers';
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -16,10 +18,18 @@ class LoginPage extends React.Component {
       password: '',
       error: '',
       loading: false,
+      loggedIn: false,
     };
 
     this.firebase = props.firebase;
     this.onLogin = this.onLogin.bind(this);
+  }
+
+  componentDidMount() {
+    // if already logged in, go right to the dashboard
+    isAuth(localStorage.getItem('token'), (res) => {
+      this.setState({ loggedIn: res.success });
+    });
   }
 
   onLogin(e) {
@@ -30,9 +40,18 @@ class LoginPage extends React.Component {
 
     // try to sign in with firebase
     this.firebase.signInWithEmail(this.state.email, this.state.password, (res) => {
-      // if it works, send the user to their dashboard
+      // if it works, give the user a signed jwt
+      // then send them to the dashboard
       if (res.success) {
-        this.props.history.push('/admin/dashboard');
+        // expires in sets length of authentication in ms
+        jwt.sign({ user: res.msg }, process.env.REACT_APP_JWT_SECRET, { expiresIn: 60 * 60 }, (error, token) => {
+          if (error) {
+            this.setState({ error });
+          } else {
+            localStorage.setItem('token', token);
+            this.props.history.push('/admin/dashboard');
+          }
+        });
       } else {
         // otherwise show the error, and make sure to stop loading
         // the error goes away when the user changes their input
@@ -45,6 +64,10 @@ class LoginPage extends React.Component {
   }
 
   render() {
+    if (this.state.loggedIn) {
+      return <Redirect to="/admin/dashboard" />
+    }
+
     return (
       <div className={styles.container}>
         <form onSubmit={this.onLogin} className={styles.form}>
