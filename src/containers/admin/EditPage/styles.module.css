@@ -1,0 +1,12 @@
+.container {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.header {
+  font-weight: bold;
+  font-size: 52px;
+  margin: 3vh 3vw 2vh 3vw;
+}

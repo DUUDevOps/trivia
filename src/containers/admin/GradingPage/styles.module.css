@@ -7,7 +7,7 @@
 
 .header {
   font-weight: bold;
-  font-size: 4.5vw;
+  font-size: 52px;
   margin: 3vh 3vw 2vh 3vw;
 }
 
@@ -90,7 +90,7 @@
   font-weight: bold;
 }
 
-.answer { 
+.answer {
   width: 35vw;
   font-size: 24px;
 }

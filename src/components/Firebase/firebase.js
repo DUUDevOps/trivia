@@ -19,6 +19,7 @@ class Firebase {
   constructor() {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
+    this.db = firebase.firestore();
   }
 
   /**
@@ -37,20 +38,123 @@ class Firebase {
   };
 
   /**
+   * @param {String} name
+   * @param {function} callback
+   */
+  createQuiz = (name, cb) => {
+    // create an empty round array
+    // 11 questions in case of bonus
+    const round = [];
+    for (let i = 0; i < 11; i++) {
+      round.push({
+        q: '',
+        a: '',
+      });
+    }
+
+    // create a new quiz with a random id
+    this.db.collection('quizzes').add({
+      name,
+      date: new Date(),
+      round1: round,
+      round2: round,
+      round3: round,
+    })
+      .then((ref) => {
+        cb(ref.id);
+      });
+  };
+
+  /**
+   * Delete a quiz by its id
+   * @param {String} quizId
+   * @param {function} callback
+   */
+  deleteQuiz = (id, cb) => {
+    this.db.collection(`quizzes`).doc(id).delete().then(() => cb());
+  };
+
+
+  /**
    * @param {Object} quiz
    * @param {function} callback
    */
-  saveQuizFromAdmin = (quiz, callback) => {
-    let quizRef = firebase.database().ref().child(this.getCurrentFormattedDate()).child('admin');
+  saveQuiz = (quiz, callback) => {
+    const docRef = this.db.collection('quizzes').doc(quiz.id);
+    docRef.set(quiz);
+    console.log('here');
+    // let quizRef = firebase.database().ref(`quizzes/${'test'}`);
+    // quizRef.set([
+    //   {
+    //     q: 'question',
+    //     a: 'answer',
+    //   }
+    // ]);
+    // console.log(quizRef);
 
     // firebase doesn't allow insertion of arrays, so create children by auto id
-    var questionNum = 1;
-    quiz.forEach(QASet => {
-      quizRef.child(questionNum).set(QASet);
-      questionNum += 1;
-    });
+    // var questionNum = 1;
+    // quiz.forEach(QASet => {
+    //   quizRef.child(questionNum).set(QASet);
+    //   questionNum += 1;
+    // });
 
-    callback();
+    // callback();
+  };
+
+  /**
+   * returns all quizzes in the database
+   * @param {function} callback
+   */
+  getQuizzes = (cb) => {
+    const quizzes = [];
+    this.db.collection('quizzes').get()
+      .then((snap) => {
+        snap.forEach((doc) => {
+          quizzes.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        cb(quizzes);
+      })
+      .catch((err) => {
+        console.error('Error getting documents', err);
+      });
+
+    // const ref = firebase.database().ref('quizzes');
+    // ref.once('value')
+    //   .then((snap) => {
+    //     console.log(snap);
+    //     console.log(snap.numChildren());
+    //     snap.forEach((childSnap) => {
+    //       console.log(childSnap.key);
+    //       console.log(childSnap.val());
+    //      });
+    //     return snap;
+    //   });
+  };
+
+  /**
+   * Get a quiz by its ID
+   * @param {String} quizID
+   * @param {function} callback
+   */
+  getQuiz = (id, cb) => {
+    this.db.collection('quizzes').doc(id).get()
+      .then((doc) => {
+        // if no doc, return no success so we can redirect
+        // else return the document data
+        if (!doc) {
+          cb({ success: false });
+        } else {
+          cb({ success: true, data: doc.data() });
+        }
+      })
+      .catch((err) => {
+        console.error('Error getting document', err);
+        cb({ success: false });
+      });
   };
 
   /**

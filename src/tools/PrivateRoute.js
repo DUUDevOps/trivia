@@ -34,13 +34,16 @@ class PrivateRoute extends React.Component {
     // don't load the page until we know if we can access it or not
     if (!this.state.loaded) return null;
 
+    // do this to take the props from the PrivateRoute to a normal Route
+    const { component: Component, ...rest } = this.props;
+
     // once we figure out if we have access, either load the page or redirect
     return (
       <Route
-        {...this.props.rest}
+        {...rest}
         render={(props) => {
           return this.state.haveAccess ? (
-            <this.props.component {...props} />
+            <Component {...props} />
           ) : (
             <Redirect to="/admin/login" />
           );
@@ -52,7 +55,6 @@ class PrivateRoute extends React.Component {
 
 PrivateRoute.propTypes = {
   component: PropTypes.func,
-  rest: PropTypes.object,
 };
 
 export default withRouter(PrivateRoute);

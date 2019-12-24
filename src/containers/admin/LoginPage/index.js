@@ -2,6 +2,7 @@ import React from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import jwt from 'jsonwebtoken';
+import { isMobile } from 'react-device-detect';
 
 import styles from './styles.module.css';
 import { withFirebase } from '../../../components/Firebase/firebase';
@@ -82,6 +83,7 @@ class LoginPage extends React.Component {
             value={this.state.email}
             onChange={(e) => this.setState({ email: e.target.value, error: '' })}
             width="80%"
+            autoFocus={!isMobile}
           />
 
           <div className={styles.subheader}>

@@ -45,7 +45,8 @@
   color: #fff;
   opacity: 0.7;
 }
-.button:hover {
+.button:hover,
+.button:focus {
   opacity: 1;
 }
 
