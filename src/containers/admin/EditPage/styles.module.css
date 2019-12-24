@@ -5,8 +5,145 @@
   left: 0;
 }
 
+.headerContainer {
+  display: flex;
+  flex-direction: row;
+  width: calc(100% - 6vw);
+  min-height: 142px;
+  margin: 3vh 3vw 2vh 3vw;
+}
+
 .header {
   font-weight: bold;
   font-size: 52px;
-  margin: 3vh 3vw 2vh 3vw;
+  flex-grow: 1;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 45px;
+  margin: 10px 0;
+  border-width: 3px;
+  border-color: #fff;
+  border-style: solid;
+  border-radius: 6px;
+  font-size: 24px;
+  color: #fff;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 200ms;
+}
+.button:hover {
+  transform: scale(0.95);
+}
+
+.buttonIcon {
+  font-size: 20px;
+  margin-right: 6px;
+}
+
+.buttonText {
+  margin-bottom: 5px;
+}
+
+.roundContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: calc(100% - 6vw);
+  margin: 20px 3vw;
+}
+
+.round {
+  width: 30%;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.7);
+  border-style: solid;
+  border-radius: 6px;
+  font-size: 28px;
+  line-height: 45px;
+  text-align: center;
+  height: 50px;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: #141e32;
+  outline: none;
+  cursor: pointer;
+  transition: 200ms;
+}
+.round:hover {
+  transform: scale(0.96);
+  color: #fff;
+  border-color: #fff;
+}
+
+.selected {
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #141e32;
+}
+.selected:hover {
+  color: #141e32;
+}
+
+.questionContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: calc(100% - 6vw);
+  margin: 45px 3vw;
+}
+
+.questionBonus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 54px;
+  height: 100px;
+  width: 100px;
+  color: #141e32;
+  background-color: #fff;
+}
+
+.questionNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 54px;
+  height: 100px;
+  width: 100px;
+  font-weight: bold;
+  color: #141e32;
+  background-color: #fff;
+}
+
+.inputsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: calc(100% - 115px);
+  height: 110px;
+  margin-left: 15px;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.inputText {
+  font-size: 26px;
+  font-weight: bold;
+  margin-right: 10px;
 }

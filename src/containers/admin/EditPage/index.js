@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 
 import styles from './styles.module.css';
 import { withFirebase } from '../../../components/Firebase/firebase';
+import TextInput from '../../../components/TextInput';
+import Loader from '../../../components/Loader';
 
 class EditPage extends React.Component {
   constructor(props) {
@@ -13,10 +15,15 @@ class EditPage extends React.Component {
     this.state = {
       quiz: {},
       redirect: false,
+      round: 'round1',
+      saving: false,
     };
 
     this.id = props.match.params.id;
     this.firebase = props.firebase;
+
+    this.setValue = this.setValue.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentDidMount() {
@@ -29,25 +36,138 @@ class EditPage extends React.Component {
     });
   }
 
+  setValue(e, type, index) {
+    const quiz = JSON.parse(JSON.stringify(this.state.quiz));
+    const round = quiz[this.state.round];
+    if (type === 'q') {
+      round[index].q = e.target.value;
+    } else {
+      round[index].a = e.target.value;
+    }
+    this.setState({ quiz });
+  }
+
+  save( next) {
+    this.setState({ saving: true });
+    // our callback is actually to call the function here that will
+    // call this functions callback/next function
+    this.firebase.saveQuiz(this.id, this.state.quiz, () => next());
+  }
+
   render() {
     if (!this.id || this.state.redirect) {
       return <Redirect to="/admin/dashboard" />
     }
 
-    return (
+    return this.state.quiz.name ? (
       <div className={styles.container}>
-        {this.state.quiz.name ? (
+        <div className={styles.headerContainer}>
           <div className={styles.header}>
             {this.state.quiz.name}
           </div>
-        ) : null}
+
+          {this.state.saving ? (
+            <Loader margin="auto 55px" />
+          ) : (
+            <div className={styles.buttonContainer}>
+              <div
+                className={styles.button}
+                role="button"
+                tabIndex={0}
+                onClick={() => this.save(() => this.setState({ saving: false }))}
+              >
+                <i className={classNames('fas fa-save', styles.buttonIcon)} />
+                <div className={styles.buttonText}>
+                  save
+                </div>
+              </div>
+              <div
+                className={styles.button}
+                role="button"
+                tabIndex={0}
+                onClick={() => this.save(() => this.props.history.push('/admin/dashboard'))}
+              >
+                <i className={classNames('fas fa-running', styles.buttonIcon)} />
+                <div className={styles.buttonText}>
+                  exit
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.roundContainer}>
+          <div
+            className={classNames(styles.round, { [styles.selected]: this.state.round === 'round1' })}
+            role="button"
+            tabIndex={0}
+            onClick={() => this.setState({ round: 'round1' })}
+          >
+            round 1
+          </div>
+          <div
+            className={classNames(styles.round, { [styles.selected]: this.state.round === 'round2' })}
+            role="button"
+            tabIndex={0}
+            onClick={() => this.setState({ round: 'round2' })}
+          >
+            round 2
+          </div>
+          <div
+            className={classNames(styles.round, { [styles.selected]: this.state.round === 'round3' })}
+            role="button"
+            tabIndex={0}
+            onClick={() => this.setState({ round: 'round3' })}
+          >
+            round 3
+          </div>
+        </div>
+
+        {this.state.quiz[this.state.round].map((data, index) => (
+          <div className={styles.questionContainer} key={index}>
+            {index === 10 ? (
+              <i className={classNames('fas fa-star', styles.questionBonus)} />
+            ) : (
+              <div className={styles.questionNum}>
+                {index}
+              </div>
+            )}
+
+            <div className={styles.inputsContainer}>
+              <div className={styles.inputContainer}>
+                <div className={styles.inputText}>
+                  q:
+                </div>
+                <TextInput
+                  placeholder="question"
+                  value={this.state.quiz[this.state.round][index].q}
+                  onChange={(e) => this.setValue(e, 'q', index)}
+                  width="100%"
+                />
+              </div>
+
+              <div className={styles.inputContainer}>
+                <div className={styles.inputText}>
+                  a:
+                </div>
+                <TextInput
+                  placeholder="answer"
+                  value={this.state.quiz[this.state.round][index].a}
+                  onChange={(e) => this.setValue(e, 'a', index)}
+                  width="100%"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    );
+    ) : null;
   }
 }
 
 EditPage.propTypes = {
   match: PropTypes.object,
+  history: PropTypes.object,
 };
 
-export default withFirebase(EditPage);
+export default withRouter(withFirebase(EditPage));

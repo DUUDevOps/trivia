@@ -76,13 +76,13 @@ class Firebase {
 
 
   /**
+   * @param {String} quizId
    * @param {Object} quiz
    * @param {function} callback
    */
-  saveQuiz = (quiz, callback) => {
-    const docRef = this.db.collection('quizzes').doc(quiz.id);
-    docRef.set(quiz);
-    console.log('here');
+  saveQuiz = (id, quiz, cb) => {
+    const docRef = this.db.collection('quizzes').doc(id);
+    docRef.set(quiz).then(() => cb());
     // let quizRef = firebase.database().ref(`quizzes/${'test'}`);
     // quizRef.set([
     //   {
@@ -121,18 +121,6 @@ class Firebase {
       .catch((err) => {
         console.error('Error getting documents', err);
       });
-
-    // const ref = firebase.database().ref('quizzes');
-    // ref.once('value')
-    //   .then((snap) => {
-    //     console.log(snap);
-    //     console.log(snap.numChildren());
-    //     snap.forEach((childSnap) => {
-    //       console.log(childSnap.key);
-    //       console.log(childSnap.val());
-    //      });
-    //     return snap;
-    //   });
   };
 
   /**
