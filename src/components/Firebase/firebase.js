@@ -83,23 +83,6 @@ class Firebase {
   saveQuiz = (id, quiz, cb) => {
     const docRef = this.db.collection('quizzes').doc(id);
     docRef.set(quiz).then(() => cb());
-    // let quizRef = firebase.database().ref(`quizzes/${'test'}`);
-    // quizRef.set([
-    //   {
-    //     q: 'question',
-    //     a: 'answer',
-    //   }
-    // ]);
-    // console.log(quizRef);
-
-    // firebase doesn't allow insertion of arrays, so create children by auto id
-    // var questionNum = 1;
-    // quiz.forEach(QASet => {
-    //   quizRef.child(questionNum).set(QASet);
-    //   questionNum += 1;
-    // });
-
-    // callback();
   };
 
   /**

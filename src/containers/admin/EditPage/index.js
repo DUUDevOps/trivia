@@ -7,6 +7,7 @@ import styles from './styles.module.css';
 import { withFirebase } from '../../../components/Firebase/firebase';
 import TextInput from '../../../components/TextInput';
 import Loader from '../../../components/Loader';
+import PopUp from '../../../components/PopUp';
 
 class EditPage extends React.Component {
   constructor(props) {
@@ -17,12 +18,14 @@ class EditPage extends React.Component {
       redirect: false,
       round: 'round1',
       saving: false,
+      editTitle: false,
     };
 
     this.id = props.match.params.id;
     this.firebase = props.firebase;
 
     this.setValue = this.setValue.bind(this);
+    this.setTitle = this.setTitle.bind(this);
     this.save = this.save.bind(this);
   }
 
@@ -47,7 +50,13 @@ class EditPage extends React.Component {
     this.setState({ quiz });
   }
 
-  save( next) {
+  setTitle(e) {
+    const quiz = JSON.parse(JSON.stringify(this.state.quiz));
+    quiz.name = e.target.value;
+    this.setState({ quiz });
+  }
+
+  save(next) {
     this.setState({ saving: true });
     // our callback is actually to call the function here that will
     // call this functions callback/next function
@@ -59,7 +68,7 @@ class EditPage extends React.Component {
       return <Redirect to="/admin/dashboard" />
     }
 
-    return this.state.quiz.name ? (
+    return this.state.quiz.name !== undefined ? (
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div className={styles.header}>
@@ -67,9 +76,23 @@ class EditPage extends React.Component {
           </div>
 
           {this.state.saving ? (
-            <Loader margin="auto 55px" />
+            <div className={styles.buttonContainer}>
+              <Loader margin="auto" />
+            </div>
           ) : (
             <div className={styles.buttonContainer}>
+              <div
+                className={styles.button}
+                role="button"
+                tabIndex={0}
+                onClick={() => this.setState({ editTitle: true })}
+              >
+                <i className={classNames('fas fa-pencil-alt', styles.buttonIcon)} />
+                <div className={styles.buttonText}>
+                  edit title
+                </div>
+              </div>
+
               <div
                 className={styles.button}
                 role="button"
@@ -81,15 +104,17 @@ class EditPage extends React.Component {
                   save
                 </div>
               </div>
+
               <div
                 className={styles.button}
                 role="button"
                 tabIndex={0}
                 onClick={() => this.save(() => this.props.history.push('/admin/dashboard'))}
+                style={{ marginRight: 0 }}
               >
                 <i className={classNames('fas fa-running', styles.buttonIcon)} />
                 <div className={styles.buttonText}>
-                  exit
+                  {'save & exit'}
                 </div>
               </div>
             </div>
@@ -126,10 +151,10 @@ class EditPage extends React.Component {
         {this.state.quiz[this.state.round].map((data, index) => (
           <div className={styles.questionContainer} key={index}>
             {index === 10 ? (
-              <i className={classNames('fas fa-star', styles.questionBonus)} />
+              <i className={classNames('fas fa-star', styles.questionNum)} />
             ) : (
               <div className={styles.questionNum}>
-                {index}
+                {index + 1}
               </div>
             )}
 
@@ -160,6 +185,20 @@ class EditPage extends React.Component {
             </div>
           </div>
         ))}
+
+        {this.state.editTitle ? (
+          <PopUp
+            text="fine, change the title..."
+            buttonOne={{
+              text: 'cool',
+              onClick: () => this.save(() => this.setState({ saving: false, editTitle: false })),
+            }}
+            loading={this.state.saving}
+            inputValue={this.state.quiz.name}
+            inputChange={this.setTitle}
+            inputPlaceholder="title"
+          />
+        ) : null}
       </div>
     ) : null;
   }
