@@ -49,13 +49,14 @@ class Firebase {
       round.push({
         q: '',
         a: '',
+        img: '',
       });
     }
 
     // create a new quiz with a random id
     this.db.collection('quizzes').add({
       name,
-      date: new Date(),
+      date: this.getCurrentFormattedDate(),
       round1: round,
       round2: round,
       round3: round,
@@ -76,6 +77,8 @@ class Firebase {
 
 
   /**
+   * save a whole quiz
+   * it's essential that the quiz is the whole quiz object
    * @param {String} quizId
    * @param {Object} quiz
    * @param {function} callback
