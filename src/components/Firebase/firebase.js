@@ -172,7 +172,7 @@ class Firebase {
         });
 
         callback(answers);
-      }).catch(error => console.log(error));
+      }).catch(error => console.error(error));
   }
 
   /**
@@ -196,7 +196,7 @@ class Firebase {
         });
 
         callback(questionsAndAnswers);
-      }).catch(error => console.log(error));
+      }).catch(error => console.error(error));
   }
 
   /**

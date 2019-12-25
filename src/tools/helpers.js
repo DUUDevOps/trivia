@@ -11,3 +11,8 @@ export const isAuth = (token, cb) => {
     }
   });
 };
+
+// grabs a random element from the provided array
+export const randomElement = (array) => {
+  return array[Math.floor(Math.random() * array.length)];
+};

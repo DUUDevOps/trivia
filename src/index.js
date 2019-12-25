@@ -10,6 +10,7 @@ import PrivateRoute from './tools/PrivateRoute';
 
 import HomePage from './containers/HomePage';
 import RegisterPage from './containers/client/RegisterPage';
+import WaitingPage from './containers/client/WaitingPage';
 import LoginPage from './containers/admin/LoginPage';
 import DashboardPage from './containers/admin/DashboardPage';
 import EditPage from './containers/admin/EditPage';
@@ -22,6 +23,7 @@ ReactDOM.render(
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route exact path="/play/register" component={RegisterPage} />
+        <Route exact path="/play/waiting" component={WaitingPage} />
         <Route exact path="/admin/login" component={LoginPage} />
         <PrivateRoute exact path="/admin/dashboard" component={DashboardPage} />
         <PrivateRoute exact path="/admin/edit/:id" component={EditPage} />
