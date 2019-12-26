@@ -2,9 +2,9 @@ import React from 'react';
 import { Route, Redirect, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import { isAuth } from './helpers';
+import { withFirebase } from '../components/Firebase/firebase';
 
-class PrivateRoute extends React.Component {
+class GameRoute extends React.Component {
   constructor(props) {
     super(props);
 
@@ -13,6 +13,8 @@ class PrivateRoute extends React.Component {
       loaded: false,
     };
 
+    this.firebase = props.firebase;
+
     this.checkAccess = this.checkAccess.bind(this);
   }
 
@@ -20,21 +22,32 @@ class PrivateRoute extends React.Component {
     this.checkAccess();
   }
 
-  // see if we can access the provide page
+  // see if we can access the page
+  // for game page, we need to see if the game data
+  // stored in local storage is for the current game
   checkAccess() {
-    isAuth(localStorage.getItem('token'), (res) => {
+    const gameData = JSON.parse(localStorage.getItem('game'));
+
+    if (!gameData) {
       this.setState({
-        haveAccess: res.success,
+        haveAccess: false,
         loaded: true,
       });
-    });
+    } else {
+      this.firebase.inGame(gameData.date, (haveAccess) => {
+        this.setState({
+          haveAccess: haveAccess,
+          loaded: true,
+        });
+      });
+    }
   }
 
   render() {
     // don't load the page until we know if we can access it or not
     if (!this.state.loaded) return null;
 
-    // do this to take the props from the PrivateRoute to a normal Route
+    // do this to take the props from the GameRoute to a normal Route
     const { component: Component, ...rest } = this.props;
 
     // once we figure out if we have access, either load the page or redirect
@@ -45,7 +58,7 @@ class PrivateRoute extends React.Component {
           return this.state.haveAccess ? (
             <Component {...props} />
           ) : (
-            <Redirect to="/admin/login" />
+            <Redirect to="/play" />
           );
         }}
       />
@@ -53,8 +66,9 @@ class PrivateRoute extends React.Component {
   }
 }
 
-PrivateRoute.propTypes = {
+GameRoute.propTypes = {
   component: PropTypes.func,
+  firebase: PropTypes.object,
 };
 
-export default withRouter(PrivateRoute);
+export default withRouter(withFirebase(GameRoute));

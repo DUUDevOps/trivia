@@ -15,11 +15,24 @@ class WaitingPage extends React.Component {
     };
 
     this.firebase = props.firebase;
+    this.dbRef = this.firebase.getDatabaseRef();
+
     this.changeExcuse = this.changeExcuse.bind(this);
   }
 
   componentDidMount() {
-    // listen for firebase events
+    // listen for a round to start, then go to answer page when it does
+    this.dbRef.on('value', (snap) => {
+      const stage = snap.val().stage;
+      if (['round1', 'round2', 'round3'].includes(stage)) {
+        this.props.history.push('/play/answer');
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    // stop listening so we don't try to update this page when we're not here
+    this.dbRef.off('value');
   }
 
   changeExcuse() {
@@ -46,6 +59,7 @@ class WaitingPage extends React.Component {
 
 WaitingPage.propTypes = {
   history: PropTypes.object,
+  firebase: PropTypes.object,
 };
 
 export default withRouter(withFirebase(WaitingPage));

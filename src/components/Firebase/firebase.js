@@ -132,6 +132,99 @@ class Firebase {
   };
 
   /**
+   * create a new game by hosting a quiz
+   * @param {String} quizId
+   */
+  hostQuiz = (id) => {
+    // store the questions here so we can easily get them
+    // and they don't change
+    this.getQuiz(id, (res) => {
+      if (!res.data) return;
+
+      firebase.database().ref().set({
+        quizId: id,
+        date: this.getCurrentFormattedDate(),
+        stage: 'join',
+        round1: res.data.round1,
+        round2: res.data.round2,
+        round3: res.data.round3,
+        leaderboard: [],
+        teams: [],
+      });
+    });
+  };
+
+  /**
+   * calls the cb with all the data in the realtime db
+   * this gives us anything we need for a live game
+   * @param {function} callback
+   */
+  getGame = (cb) => {
+    firebase.database().ref().once('value')
+      .then((snap) => {
+        cb(snap.val());
+      });
+  };
+
+  /**
+   * joins the live game by adding the team
+   * to the teams object
+   * @param {String} teamName
+   * @param {array} teamIds
+   * @param {function} callback
+   */
+  joinGame = (teamName, teamIds, cb) => {
+    firebase.database().ref().once('value')
+      .then((snap) => {
+        // if first team, we create the new object
+        const teams = snap.val().teams || {};
+        teams[teamName] = {
+          ids: teamIds,
+        };
+
+        firebase.database().ref('teams').set(teams);
+
+        // calls cb with the date and team name to
+        // store in local storage for the client
+        // date for verification of being in live game
+        // name for accessing team in live game later
+        cb({
+          date: snap.val().date,
+          name: teamName,
+        });
+      });
+  };
+
+  /**
+   * used to verify that the user is in the live game
+   * by seeing if their date is equal to the live game's start date
+   * @param {String} date
+   * @param {function} callback
+   */
+  inGame = (date, cb) => {
+    firebase.database().ref().once('value')
+      .then((snap) => {
+        cb(snap.val().date === date);
+      });
+  };
+
+  /**
+   * changes the live game's stage
+   * @param {String} newStage
+   */
+  setStage = (newStage) => {
+    firebase.database().ref('stage').set(newStage);
+  }
+
+  /**
+   * returns a references to the live database
+   * so we can listen for changes on each page
+   */
+  getDatabaseRef = () => {
+    return firebase.database().ref();
+  };
+
+  /**
    * @param {number} teamNumber
    * @param {array} answers
    * @param {function} callback
@@ -203,8 +296,10 @@ class Firebase {
    * @returns {string}
    */
   getCurrentFormattedDate = () => {
-    // this will return the date in yyyy-mm-dd
-    return new Date().toISOString().slice(0, 10);
+    // this will return the date in string format
+    // this prevents it from changing in firebase
+    // and provides uniqueness to games
+    return new Date().toISOString();
   };
 }
 

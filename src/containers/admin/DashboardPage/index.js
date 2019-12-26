@@ -32,6 +32,7 @@ class DashboardPage extends React.Component {
     this.loadQuizzes();
   }
 
+  // creates a new quiz and opens the page to edit it
   onCreate() {
     this.setState({ loading: true });
     this.firebase.createQuiz(this.state.createText, (id) => {
@@ -39,6 +40,7 @@ class DashboardPage extends React.Component {
     });
   }
 
+  // deletes the quiz
   onDelete() {
     this.setState({ loading: true });
     this.firebase.deleteQuiz(this.state.deleteId, () => {
@@ -47,6 +49,7 @@ class DashboardPage extends React.Component {
     });
   }
 
+  // gets the current quizzes from the database
   loadQuizzes() {
     this.firebase.getQuizzes((quizzes) => {
       this.setState({ quizzes });
@@ -89,7 +92,7 @@ class DashboardPage extends React.Component {
                 <Link
                   className={classNames('fas fa-play', styles.quizButton)}
                   data-tip="host"
-                  to={`/admin/host/${q.id}`}
+                  to={`/host/${q.id}`}
                 />
                 <i
                   className={classNames('fas fa-trash-alt', styles.quizButton)}
@@ -140,6 +143,7 @@ class DashboardPage extends React.Component {
 
 DashboardPage.propTypes = {
   history: PropTypes.object,
+  firebase: PropTypes.object,
 };
 
 export default withRouter(withFirebase(DashboardPage));
