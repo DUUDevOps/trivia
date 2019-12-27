@@ -19,11 +19,16 @@ class AnswerPage extends React.Component {
 
     this.firebase = props.firebase;
     this.dbRef = this.firebase.getDatabaseRef();
+
+    this.round = '';
+
+    this.changeAnswer = this.changeAnswer.bind(this);
   }
 
   componentDidMount() {
     this.firebase.getGame((game) => {
       let num = 10;
+      this.round = game.stage;
       // see if there is a bonus question for this round
       // if so add an extra answer field
       if (game[game.stage][10].q) {
@@ -53,10 +58,14 @@ class AnswerPage extends React.Component {
     this.dbRef.on('value', (snap) => {
       const stage = snap.val().stage;
       if (['round1-grading', 'round2-grading', 'round3-grading'].includes(stage)) {
-        this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.state.stage, this.state.answers);
+        this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.round, this.state.answers);
         this.props.history.push('/play/waiting');
       }
     });
+  }
+
+  componentWillUnmount() {
+    this.dbRef.off('value');
   }
 
   changeAnswer(e, index) {

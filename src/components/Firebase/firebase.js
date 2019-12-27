@@ -235,54 +235,19 @@ class Firebase {
   };
 
   /**
-   * @param {Number} teamNumber
+   * set the new team standings and set stage to standings
+   * @param {object} teams
+   * @param {string} round
    * @param {function} callback
    */
-  getAnswersForTeam = (teamNumber, callback) => {
-    let teamRef = firebase.database().ref()
-      .child(this.getCurrentFormattedDate())
-      .child('teams')
-      .child(teamNumber);
-
-    teamRef.once('value')
-      .then(snapshot => {
-        if (!snapshot.exists()) {
-          return;
-        }
-
-        var answers = new Array(snapshot.numChildren());
-
-        snapshot.forEach(answer => {
-          answers[parseInt(answer.key)] = answer.val();
-        });
-
-        callback(answers);
-      }).catch(error => console.error(error));
-  }
-
-  /**
-   * @param {function} callback
-   */
-  getQuestionsAndCorrectAnswers = (callback) => {
-    let roundRef = firebase.database().ref()
-      .child(this.getCurrentFormattedDate())
-      .child('admin');
-
-    roundRef.once('value')
-      .then(snapshot => {
-        if (!snapshot.exists()) {
-          return;
-        }
-
-        var questionsAndAnswers = new Array(snapshot.numChildren())
-
-        snapshot.forEach(question => {
-          questionsAndAnswers[parseInt(question.key)] = question.val();
-        });
-
-        callback(questionsAndAnswers);
-      }).catch(error => console.error(error));
-  }
+  setStandings = (teams, round, cb) => {
+    // inefficient christmas tree, but not sure if await works with firebase
+    firebase.database().ref('teams').set(teams)
+      .then(() => {
+        firebase.database().ref('stage').set(`${round}-leaderboard`)
+          .then(cb);
+      })
+  };
 
   /**
    * @returns {string}

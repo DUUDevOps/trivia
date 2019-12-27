@@ -57,6 +57,8 @@ class DashboardPage extends React.Component {
   }
 
   render() {
+    // TODO: add resume game button in case of disconnect/accidental exits/token expirations
+
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -92,7 +94,7 @@ class DashboardPage extends React.Component {
                 <Link
                   className={classNames('fas fa-play', styles.quizButton)}
                   data-tip="host"
-                  to={`/host/${q.id}`}
+                  to={`/host/join/${q.id}`}
                 />
                 <i
                   className={classNames('fas fa-trash-alt', styles.quizButton)}

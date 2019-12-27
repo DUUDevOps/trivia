@@ -89,6 +89,8 @@ class PlayPage extends React.Component {
   }
 
   render() {
+    // TODO: add rejoin page/option
+
     return (
       <form onSubmit={this.onJoin} className={styles.container}>
         <div className={styles.header}>
