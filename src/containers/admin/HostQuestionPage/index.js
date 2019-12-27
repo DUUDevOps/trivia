@@ -56,8 +56,9 @@ class HostQuestionPage extends React.Component {
   }
 
   endRound() {
-    this.firebase.setStage(`${this.stage}-grading`);
-    this.props.history.push('/host/grading')
+    this.firebase.setStage(`${this.stage}-grading`, () => {
+      this.props.history.push('/host/grading');
+    });
   }
 
   render() {
@@ -69,7 +70,7 @@ class HostQuestionPage extends React.Component {
       <div className={styles.container}>
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
-          {`question ${this.state.qnum}`}
+          {this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
         </div>
 
         <div className={styles.questionContainer}>

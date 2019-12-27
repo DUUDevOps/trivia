@@ -39,14 +39,17 @@ class HostPage extends React.Component {
 
   // tell everyone its the first round and show the first question
   start() {
-    this.firebase.setStage('round1');
-    this.props.history.push('/host/question/1');
+    this.firebase.setStage('round1', () => {
+      this.props.history.push('/host/question/1');
+    });
   }
 
   render() {
     if (!this.id) {
       return <Redirect to="/admin/dashboard" />;
     }
+
+    // TODO: change join/play url
 
     return (
       <div className={styles.container}>
@@ -63,7 +66,7 @@ class HostPage extends React.Component {
         </div>
 
         <div className={styles.instructText}>
-          join at&nbsp;<u>localhost:3000/join</u>
+          join at&nbsp;<u>localhost:3000/play</u>
         </div>
 
         <div className={styles.teamsContainer}>

@@ -16,3 +16,36 @@ export const isAuth = (token, cb) => {
 export const randomElement = (array) => {
   return array[Math.floor(Math.random() * array.length)];
 };
+
+const placeTexts = [
+  'st',
+  'nd',
+  'rd',
+  'th',
+];
+
+// returns element from placeTexts that matches place
+export const getPlaceText = (place) => {
+  return place % 100 < 11 || place % 100 > 13
+    ? place % 10 === 1
+      ? placeTexts[0] : place % 10 === 2
+        ? placeTexts[1] : place % 10 === 3
+          ? placeTexts[2] : placeTexts[3] : placeTexts[3];
+};
+
+// takes net ids and puts them in a string
+export const getIdsText = (ids) => {
+  let string = ids[0];
+  if (ids.length === 2) {
+    string += ` & ${ids[1]}`;
+  } else {
+    for (let i = 1; i < ids.length; i++) {
+      if (i === ids.length - 1) {
+        string += `, & ${ids[i]}`;
+      } else {
+        string += `, ${ids[i]}`;
+      }
+    }
+  }
+  return string;
+};

@@ -46,7 +46,7 @@ class GradingPage extends React.Component {
           round,
         });
       });
-    }, 3000);
+    }, 2000);
   }
 
   // just saving this because it might be better than that derived state thing on question page
@@ -84,7 +84,7 @@ class GradingPage extends React.Component {
         currentTeamNum,
       }, () => window.scrollTo(0, 0));
     } else {
-      // otherwise save the scores and show the leaderboard
+      // otherwise save the scores
       const teams = JSON.parse(JSON.stringify(this.state.teams));
       for (let i = 0; i < this.state.teamNames.length; i++) {
         const name = this.state.teamNames[i];
@@ -94,19 +94,21 @@ class GradingPage extends React.Component {
         teams[name].score = score;
       }
 
-      // set standings and then go to the leaderboard
+      // after setting standings, then go to the leaderboard/standings page
       // cb makes sure standings are set before we try to show them
       this.firebase.setStandings(teams, this.state.round, () => {
-        this.props.history.push('/host/leaderboard');
+        this.props.history.push('/host/standings');
       });
     }
   }
 
   render() {
+    // TODO: mobile styling support
+
     return this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <div className={styles.header}>
-          {`team ${this.state.currentTeamNum}/${this.state.teamNames.length}`}
+          {`team ${this.state.currentTeamNum + 1}/${this.state.teamNames.length}`}
         </div>
 
         <div className={styles.headerContainer}>
@@ -135,7 +137,9 @@ class GradingPage extends React.Component {
                   {q.a}
                 </div>
                 <div className={styles.answer} style={{ marginLeft: '5vw' }}>
-                  {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i]}
+                  {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
+                    && this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i]
+                      ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i] : 'no answer'}
                 </div>
 
                 <div

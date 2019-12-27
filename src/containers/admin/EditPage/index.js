@@ -68,6 +68,8 @@ class EditPage extends React.Component {
       return <Redirect to="/admin/dashboard" />
     }
 
+    // TODO: allows images to be added
+
     return this.state.quiz.name !== undefined ? (
       <div className={styles.container}>
         <div className={styles.headerContainer}>

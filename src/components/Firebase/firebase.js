@@ -148,7 +148,6 @@ class Firebase {
         round1: res.data.round1,
         round2: res.data.round2,
         round3: res.data.round3,
-        leaderboard: [],
         teams: [],
       });
     });
@@ -211,9 +210,10 @@ class Firebase {
   /**
    * changes the live game's stage
    * @param {String} newStage
+   * @param {function} callback
    */
-  setStage = (newStage) => {
-    firebase.database().ref('stage').set(newStage);
+  setStage = (newStage, cb) => {
+    firebase.database().ref('stage').set(newStage).then(cb);
   }
 
   /**
@@ -244,9 +244,8 @@ class Firebase {
     // inefficient christmas tree, but not sure if await works with firebase
     firebase.database().ref('teams').set(teams)
       .then(() => {
-        firebase.database().ref('stage').set(`${round}-leaderboard`)
-          .then(cb);
-      })
+        this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, cb);
+      });
   };
 
   /**
