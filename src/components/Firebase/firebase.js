@@ -225,21 +225,13 @@ class Firebase {
   };
 
   /**
-   * @param {number} teamNumber
+   * save a team answers for a round
+   * @param {string} teamName
+   * @param {string} round
    * @param {array} answers
-   * @param {function} callback
    */
-  saveAnswersForTeam = (teamNumber, answers, callback) => {
-    let teamRef = firebase.database().ref()
-      .child(this.getCurrentFormattedDate())
-      .child('teams')
-      .child(teamNumber);
-
-    answers.forEach((answer, index) => {
-      teamRef.child(index).set(answer);
-    });
-
-    callback();
+  setTeamAnswers = (teamName, round, answers) => {
+    firebase.database().ref(`teams/${teamName}/${round}`).set(answers);
   };
 
   /**

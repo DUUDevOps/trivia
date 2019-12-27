@@ -18,10 +18,10 @@ class AnswerPage extends React.Component {
     };
 
     this.firebase = props.firebase;
+    this.dbRef = this.firebase.getDatabaseRef();
   }
 
   componentDidMount() {
-    // listen for firebase events
     this.firebase.getGame((game) => {
       let num = 10;
       // see if there is a bonus question for this round
@@ -47,6 +47,15 @@ class AnswerPage extends React.Component {
       }
 
       this.setState({ answers, stage });
+    });
+
+    // listen for the round to end
+    this.dbRef.on('value', (snap) => {
+      const stage = snap.val().stage;
+      if (['round1-grading', 'round2-grading', 'round3-grading'].includes(stage)) {
+        this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.state.stage, this.state.answers);
+        this.props.history.push('/play/waiting');
+      }
     });
   }
 

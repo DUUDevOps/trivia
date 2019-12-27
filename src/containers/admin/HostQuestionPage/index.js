@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import { Textfit } from 'react-textfit';
 
@@ -13,23 +13,51 @@ class HostQuestionPage extends React.Component {
     super(props);
 
     this.state = {
-      question: {},
       qnum: parseInt(props.match.params.qnum),
-      numQuestions: 0,
+      question: {},
+      questions: [],
     };
 
     this.firebase = props.firebase;
+
+    this.stage = '';
+
+    this.endRound = this.endRound.bind(this);
   }
 
   componentDidMount() {
-    // get the question from the realtime db
+    // get the questions from the realtime db
+    // we'll use these questions for the whole round because this page
+    // will never fully reload
     this.firebase.getGame((game) => {
-      const questions = game[game.stage];
+      // filter out the bonus if it doesn't exist
+      const questions = game[game.stage].filter((q) => (q.q !== ''));
+      // for ending the round later
+      this.stage = game.stage;
       this.setState({
         question: questions[this.state.qnum - 1],
-        numQuestions: questions.length,
+        questions,
       });
     });
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // if the qnum changes, change the question
+    // we do this because the page will not automatically rerender when qnum changes
+    const newQnum = parseInt(nextProps.match.params.qnum);
+    if (newQnum !== prevState.qnum) {
+      return {
+        qnum: newQnum,
+        question: prevState.questions[newQnum - 1],
+      };
+    } else {
+      return prevState;
+    }
+  }
+
+  endRound() {
+    this.firebase.setStage(`${this.stage}-grading`);
+    this.props.history.push('/host/grading')
   }
 
   render() {
@@ -37,7 +65,7 @@ class HostQuestionPage extends React.Component {
       return <Redirect to="/admin/login" />;
     }
 
-    return this.state.numQuestions ? (
+    return this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
@@ -61,14 +89,18 @@ class HostQuestionPage extends React.Component {
           ) : null}
         </div>
 
-        <Link
-          className={styles.nextButton}
-          to={this.state.qnum === this.state.numQuestions ? '/host/results' : `/host/question/${this.state.qnum + 1}`}
-          style={{ right: '3vw', bottom: '3vh' }}
-        >
-          {this.state.qnum === this.state.numQuestions ? 'end round' : 'next'}
-          <i className={classNames('fas fa-arrow-right', styles.arrow)} />
-        </Link>
+        {this.state.qnum === this.state.questions.length ? (
+          <div className={styles.nextButton} role="button" tabIndex={0} onClick={this.endRound} style={{ right: '3vw', bottom: '3vh' }}>
+            end round
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </div>
+        ) : (
+          <Link className={styles.nextButton} to={`/host/question/${this.state.qnum + 1}`} style={{ right: '3vw', bottom: '3vh' }}>
+            next
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </Link>
+        )}
+
         {this.state.qnum !== 1 ? (
           <Link
             className={styles.nextButton}
@@ -87,6 +119,7 @@ class HostQuestionPage extends React.Component {
 HostQuestionPage.propTypes = {
   match: PropTypes.object,
   firebase: PropTypes.object,
+  history: PropTypes.object,
 };
 
-export default withFirebase(HostQuestionPage);
+export default withRouter(withFirebase(HostQuestionPage));

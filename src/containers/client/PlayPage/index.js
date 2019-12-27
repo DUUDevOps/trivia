@@ -79,6 +79,8 @@ class PlayPage extends React.Component {
         this.setState({ error });
       } else {
         this.firebase.joinGame(this.state.team, ids, (data) => {
+          // localStorage can't store objects, so we stringify it
+          // but this means we have to call JSON.parse each time we want to access it
           localStorage.setItem('game', JSON.stringify(data));
           this.props.history.push('/play/waiting');
         });

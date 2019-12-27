@@ -33,7 +33,7 @@ ReactDOM.render(
         <AdminRoute exact path="/admin/edit/:id" component={EditPage} />
         <AdminRoute exact path="/host/:id" component={HostPage} />
         <AdminRoute exact path="/host/question/:qnum" component={HostQuestionPage} />
-        <Route exact path="/admin/grading/:team" component={GradingPage} />
+        <Route exact path="/host/grading/:team" component={GradingPage} />
         <Route component={HomePage} />
       </Switch>
     </BrowserRouter>
