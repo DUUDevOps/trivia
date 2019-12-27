@@ -45,7 +45,8 @@ class LoginPage extends React.Component {
       // then send them to the dashboard
       if (res.success) {
         // expires in sets length of authentication in ms
-        jwt.sign({ user: res.msg }, process.env.REACT_APP_JWT_SECRET, { expiresIn: 60 * 60 }, (error, token) => {
+        // TODO: decide what to set expiresIn to, currently 24 hours
+        jwt.sign({ user: res.msg }, process.env.REACT_APP_JWT_SECRET, { expiresIn: 60 * 60 * 24 }, (error, token) => {
           if (error) {
             this.setState({ error });
           } else {
