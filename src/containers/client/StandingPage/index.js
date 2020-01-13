@@ -94,8 +94,8 @@ class StandingPage extends React.Component {
     });
 
     // listen for a round to start, then go to answer page when it does
-    this.dbRef.on('value', (snap) => {
-      const stage = snap.val().stage;
+    this.dbRef.on('value', (snapshot) => {
+      const stage = snapshot.val().stage;
       if (['round2', 'round3'].includes(stage)) {
         this.props.history.push('/play/answer');
       }

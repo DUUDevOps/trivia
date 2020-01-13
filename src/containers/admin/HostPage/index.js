@@ -27,8 +27,8 @@ class HostPage extends React.Component {
     this.firebase.hostQuiz(this.id);
 
     // listen for new teams to join
-    this.dbRef.on('value', (snap) => {
-      this.setState({ teams: snap.val().teams ? Object.keys(snap.val().teams) : [] });
+    this.dbRef.on('value', (snapshot) => {
+      this.setState({ teams: snapshot.val().teams ? Object.keys(snapshot.val().teams) : [] });
     });
   }
 

@@ -27,13 +27,13 @@ class Firebase {
    * @param {string} password
    * @param {function} callback
    */
-  signInWithEmail = (email, password, cb) => {
+  signInWithEmail = (email, password, callback) => {
     this.auth.signInWithEmailAndPassword(email, password)
       .then((res) => {
-        cb({ success: true, msg: email });
+        callback({ success: true, msg: email });
       })
       .catch((err) => {
-        cb({ success: false, msg: err.message })
+        callback({ success: false, msg: err.message })
       });
   };
 
@@ -41,7 +41,7 @@ class Firebase {
    * @param {String} name
    * @param {function} callback
    */
-  createQuiz = (name, cb) => {
+  createQuiz = (name, callback) => {
     // create an empty round array
     // 11 questions in case of bonus
     const round = [];
@@ -62,7 +62,7 @@ class Firebase {
       round3: round,
     })
       .then((ref) => {
-        cb(ref.id);
+        callback(ref.id);
       });
   };
 
@@ -71,8 +71,8 @@ class Firebase {
    * @param {String} quizId
    * @param {function} callback
    */
-  deleteQuiz = (id, cb) => {
-    this.db.collection(`quizzes`).doc(id).delete().then(() => cb());
+  deleteQuiz = (id, callback) => {
+    this.db.collection(`quizzes`).doc(id).delete().then(callback);
   };
 
 
@@ -83,26 +83,26 @@ class Firebase {
    * @param {Object} quiz
    * @param {function} callback
    */
-  saveQuiz = (id, quiz, cb) => {
+  saveQuiz = (id, quiz, callback) => {
     const docRef = this.db.collection('quizzes').doc(id);
-    docRef.set(quiz).then(() => cb());
+    docRef.set(quiz).then(callback);
   };
 
   /**
    * returns all quizzes in the database
    * @param {function} callback
    */
-  getQuizzes = (cb) => {
+  getQuizzes = (callback) => {
     const quizzes = [];
     this.db.collection('quizzes').get()
-      .then((snap) => {
-        snap.forEach((doc) => {
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
           quizzes.push({
             id: doc.id,
             data: doc.data(),
           });
         });
-        cb(quizzes);
+        callback(quizzes);
       })
       .catch((err) => {
         console.error('Error getting documents', err);
@@ -114,20 +114,20 @@ class Firebase {
    * @param {String} quizID
    * @param {function} callback
    */
-  getQuiz = (id, cb) => {
+  getQuiz = (id, callback) => {
     this.db.collection('quizzes').doc(id).get()
       .then((doc) => {
         // if no doc, return no success so we can redirect
         // else return the document data
         if (!doc) {
-          cb({ success: false });
+          callback({ success: false });
         } else {
-          cb({ success: true, data: doc.data() });
+          callback({ success: true, data: doc.data() });
         }
       })
       .catch((err) => {
         console.error('Error getting document', err);
-        cb({ success: false });
+        callback({ success: false });
       });
   };
 
@@ -154,14 +154,14 @@ class Firebase {
   };
 
   /**
-   * calls the cb with all the data in the realtime db
+   * calls the callback with all the data in the realtime db
    * this gives us anything we need for a live game
    * @param {function} callback
    */
-  getGame = (cb) => {
+  getGame = (callback) => {
     firebase.database().ref().once('value')
-      .then((snap) => {
-        cb(snap.val());
+      .then((snapshot) => {
+        callback(snapshot.val());
       });
   };
 
@@ -172,23 +172,23 @@ class Firebase {
    * @param {array} teamIds
    * @param {function} callback
    */
-  joinGame = (teamName, teamIds, cb) => {
+  joinGame = (teamName, teamIds, callback) => {
     firebase.database().ref().once('value')
-      .then((snap) => {
+      .then((snapshot) => {
         // if first team, we create the new object
-        const teams = snap.val().teams || {};
+        const teams = snapshot.val().teams || {};
         teams[teamName] = {
           ids: teamIds,
         };
 
         firebase.database().ref('teams').set(teams);
 
-        // calls cb with the date and team name to
+        // calls callback with the date and team name to
         // store in local storage for the client
         // date for verification of being in live game
         // name for accessing team in live game later
-        cb({
-          date: snap.val().date,
+        callback({
+          date: snapshot.val().date,
           name: teamName,
         });
       });
@@ -200,10 +200,10 @@ class Firebase {
    * @param {String} date
    * @param {function} callback
    */
-  inGame = (date, cb) => {
+  inGame = (date, callback) => {
     firebase.database().ref().once('value')
-      .then((snap) => {
-        cb(snap.val().date === date);
+      .then((snapshot) => {
+        callback(snapshot.val().date === date);
       });
   };
 
@@ -212,8 +212,8 @@ class Firebase {
    * @param {String} newStage
    * @param {function} callback
    */
-  setStage = (newStage, cb) => {
-    firebase.database().ref('stage').set(newStage).then(cb);
+  setStage = (newStage, callback) => {
+    firebase.database().ref('stage').set(newStage).then(callback);
   }
 
   /**
@@ -240,11 +240,11 @@ class Firebase {
    * @param {string} round
    * @param {function} callback
    */
-  setStandings = (teams, round, cb) => {
+  setStandings = (teams, round, callback) => {
     // inefficient christmas tree, but not sure if await works with firebase
     firebase.database().ref('teams').set(teams)
       .then(() => {
-        this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, cb);
+        this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, callback);
       });
   };
 

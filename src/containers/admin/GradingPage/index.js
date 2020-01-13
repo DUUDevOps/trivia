@@ -22,7 +22,7 @@ class GradingPage extends React.Component {
 
     this.firebase = props.firebase;
 
-    this.teamScores = [];
+    this.currentRoundTeamScores = [];
 
     this.changeGrade = this.changeGrade.bind(this);
     this.nextTeam = this.nextTeam.bind(this);
@@ -74,7 +74,7 @@ class GradingPage extends React.Component {
 
   nextTeam() {
     // add one point for each correct answer
-    this.teamScores.push(this.state.teamCorrects.filter(Boolean).length);
+    this.currentRoundTeamScores.push(this.state.teamCorrects.filter(Boolean).length);
 
     const currentTeamNum = this.state.currentTeamNum + 1;
     // keep repeating if we have teams left
@@ -90,12 +90,12 @@ class GradingPage extends React.Component {
         const name = this.state.teamNames[i];
         // add to the current score if possible
         let score = teams[name].score || 0;
-        score += this.teamScores[i];
+        score += this.currentRoundTeamScores[i];
         teams[name].score = score;
       }
 
       // after setting standings, then go to the leaderboard/standings page
-      // cb makes sure standings are set before we try to show them
+      // callback makes sure standings are set before we try to show them
       this.firebase.setStandings(teams, this.state.round, () => {
         this.props.history.push('/host/standings');
       });

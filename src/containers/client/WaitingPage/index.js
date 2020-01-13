@@ -23,8 +23,8 @@ class WaitingPage extends React.Component {
   componentDidMount() {
     // listen for the first round to start or grading to be finished (standings to show)
     // then go to answer page when it does
-    this.dbRef.on('value', (snap) => {
-      const stage = snap.val().stage;
+    this.dbRef.on('value', (snapshot) => {
+      const stage = snapshot.val().stage;
       if (stage === 'round1') {
         this.props.history.push('/play/answer');
       } else if (stage.includes('-') && stage.split('-')[1].includes('standings')) {

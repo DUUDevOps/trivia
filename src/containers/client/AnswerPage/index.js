@@ -55,8 +55,8 @@ class AnswerPage extends React.Component {
     });
 
     // listen for the round to end
-    this.dbRef.on('value', (snap) => {
-      const stage = snap.val().stage;
+    this.dbRef.on('value', (snapshot) => {
+      const stage = snapshot.val().stage;
       if (['round1-grading', 'round2-grading', 'round3-grading'].includes(stage)) {
         this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.round, this.state.answers);
         this.props.history.push('/play/waiting');

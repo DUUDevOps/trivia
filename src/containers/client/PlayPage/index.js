@@ -37,9 +37,9 @@ class PlayPage extends React.Component {
       })
     });
 
-    this.dbRef.on('value', (snap) => {
+    this.dbRef.on('value', (snapshot) => {
       this.setState({
-        joinable: snap.val().stage === 'join',
+        joinable: snapshot.val().stage === 'join',
       });
     });
   }
