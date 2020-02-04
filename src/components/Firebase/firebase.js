@@ -47,9 +47,9 @@ class Firebase {
     const round = [];
     for (let i = 0; i < 11; i++) {
       round.push({
-        question: '',
-        answer: '',
-        image: '',
+        q: '',
+        a: '',
+        img: '',
       });
     }
 
