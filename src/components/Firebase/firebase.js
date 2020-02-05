@@ -15,13 +15,15 @@ const config = {
 // const NUM_QUESTIONS = 10;
 
 const LIVE_GAME_REF = "currentGame";
+const QUIZZES_REF = "quizzes";
 
 class Firebase {
   constructor() {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
     this.db = firebase.firestore();
-    this.liveGameRef = firebase.database().ref(LIVE_GAME_REF);
+    this.liveGameRef = this.getLiveGameRef();
+    this.quizzesRef = this.getQuizzesRef();
   }
 
   /**
@@ -72,7 +74,7 @@ class Firebase {
       round3: round
     };
 
-    let newQuizRef = firebase.database().ref().push();
+    let newQuizRef = this.quizzesRef.push();
     newQuizRef.set(newQuiz)
       .then(() => callback(newQuizRef.key));
   };
@@ -83,7 +85,7 @@ class Firebase {
    * @param {function} callback
    */
   deleteQuiz = (id, callback) => {
-    firebase.database().ref(id)
+    this.quizzesRef.child(id)
       .remove()
       .then(callback);
   };
@@ -99,7 +101,7 @@ class Firebase {
   saveQuiz = (id, quiz, callback) => {
     // const docRef = this.db.collection('quizzes').doc(id);
     // docRef.set(quiz).then(callback);
-    firebase.database().ref(id)
+    this.quizzesRef.child(id)
       .set(quiz)
       .then(callback);
   };
@@ -123,7 +125,7 @@ class Firebase {
     //   .catch((err) => {
     //     console.error('Error getting documents', err);
     //   });
-    firebase.database().ref().once('value')
+    this.quizzesRef.once('value')
       .then(snapshot => {
         snapshot.forEach(child => {
           quizzes.push({
@@ -156,7 +158,7 @@ class Firebase {
     //     console.error('Error getting document', err);
     //     callback({ success: false });
     //   });
-    firebase.database().ref(id)
+    this.quizzesRef.child(id)
       .once('value')
       .then(snapshot => {
         if (!snapshot.exists()) {
@@ -264,6 +266,13 @@ class Firebase {
    */
   getLiveGameRef = () => {
     return firebase.database().ref(LIVE_GAME_REF);
+  };
+
+  /**
+   * Returns a reference to the quizzes part of the database
+   */
+  getQuizzesRef = () => {
+    return firebase.database().ref(QUIZZES_REF);
   };
 
   /**
