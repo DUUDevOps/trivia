@@ -18,7 +18,7 @@ class AnswerPage extends React.Component {
     };
 
     this.firebase = props.firebase;
-    this.dbRef = this.firebase.getDatabaseRef();
+    this.dbRef = this.firebase.getLiveGameRef();
 
     this.round = '';
 
@@ -26,7 +26,9 @@ class AnswerPage extends React.Component {
   }
 
   componentDidMount() {
-    this.firebase.getGame((game) => {
+    this.firebase.getGame((res) => {
+      if (!res.success) return;
+      const game = res.data;
       let num = 10;
       this.round = game.stage;
       // see if there is a bonus question for this round

@@ -16,7 +16,7 @@ class HostPage extends React.Component {
     };
 
     this.firebase = props.firebase;
-    this.dbRef = this.firebase.getDatabaseRef();
+    this.dbRef = this.firebase.getLiveGameRef();
     this.id = props.match.params.id;
 
     this.start = this.start.bind(this);

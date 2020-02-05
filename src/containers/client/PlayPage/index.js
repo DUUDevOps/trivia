@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import classNames from 'classnames';
 
@@ -17,10 +17,11 @@ class PlayPage extends React.Component {
       ids: [''],
       joinable: true,
       error: '',
+      dbExists: true,
     };
 
     this.firebase = props.firebase;
-    this.dbRef = this.firebase.getDatabaseRef();
+    this.dbRef = this.firebase.getLiveGameRef();
 
     this.changeId = this.changeId.bind(this);
     this.onJoin = this.onJoin.bind(this);
@@ -32,15 +33,22 @@ class PlayPage extends React.Component {
 
     // see if we can join the game right now
     this.firebase.getGame((game) => {
-      this.setState({
-        joinable: game.stage === 'join',
-      })
+      if (!game.success) {
+        this.setState({ dbExists: false });
+      } else {
+        this.setState({
+          joinable: game.data.stage === 'join',
+        });
+      }
     });
 
+    // in the future, listen for changes
     this.dbRef.on('value', (snapshot) => {
-      this.setState({
-        joinable: snapshot.val().stage === 'join',
-      });
+      if (snapshot.exists()) {
+        this.setState({
+          joinable: snapshot.val().stage === 'join',
+        });
+      }
     });
   }
 
@@ -69,7 +77,9 @@ class PlayPage extends React.Component {
       error = "what's your team's name";
     }
 
-    this.firebase.getGame((game) => {
+    this.firebase.getGame((res) => {
+      if (!res.success) return;
+      const game = res.data;
       const teams = game.teams ? Object.keys(game.teams) : [];
       if (teams.includes(this.state.team)) {
         error = "team name already taken";
@@ -90,6 +100,9 @@ class PlayPage extends React.Component {
 
   render() {
     // TODO: add rejoin page/option
+    if (!this.state.dbExists) {
+      return <Redirect to="/" />
+    }
 
     return (
       <form onSubmit={this.onJoin} className={styles.container}>

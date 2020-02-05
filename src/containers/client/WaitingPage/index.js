@@ -15,7 +15,7 @@ class WaitingPage extends React.Component {
     };
 
     this.firebase = props.firebase;
-    this.dbRef = this.firebase.getDatabaseRef();
+    this.dbRef = this.firebase.getLiveGameRef();
 
     this.changeExcuse = this.changeExcuse.bind(this);
   }

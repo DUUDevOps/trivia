@@ -29,7 +29,9 @@ class HostQuestionPage extends React.Component {
     // get the questions from the realtime db
     // we'll use these questions for the whole round because this page
     // will never fully reload
-    this.firebase.getGame((game) => {
+    this.firebase.getGame((res) => {
+      if (!res.success) return;
+      const game = res.data;
       // filter out the bonus if it doesn't exist
       const questions = game[game.stage].filter((q) => (q.q !== ''));
       // for ending the round later

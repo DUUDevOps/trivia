@@ -2,24 +2,26 @@ import firebase from 'firebase';
 import React from 'react';
 
 const config = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: "duu-trivia.firebaseapp.com",
-  databaseURL: "https://duu-trivia.firebaseio.com",
-  projectId: "duu-trivia",
-  storageBucket: "duu-trivia.appspot.com",
-  messagingSenderId: "503528390951",
-  appId: "1:503528390951:web:691b0e36f43d7209706902",
-  measurementId: "G-L05CNT2ZWP"
+  apiKey: "AIzaSyARGwqdebOb043X-pjG6b18iGkJ7LDRk68",
+  authDomain: "duu-trivia-c9587.firebaseapp.com",
+  databaseURL: "https://duu-trivia-c9587.firebaseio.com",
+  projectId: "duu-trivia-c9587",
+  storageBucket: "duu-trivia-c9587.appspot.com",
+  messagingSenderId: "653573216029",
+  appId: "1:653573216029:web:c9f655c0b7b000eddef3f4"
 };
 
 // const ADMIN_REF_NAME = "quizzes";
 // const NUM_QUESTIONS = 10;
+
+const LIVE_GAME_REF = "currentGame";
 
 class Firebase {
   constructor() {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
     this.db = firebase.firestore();
+    this.liveGameRef = firebase.database().ref(LIVE_GAME_REF);
   }
 
   /**
@@ -54,16 +56,25 @@ class Firebase {
     }
 
     // create a new quiz with a random id
-    this.db.collection('quizzes').add({
+    // this.db.collection('quizzes').add({
+    //   name,
+    //   date: this.getCurrentFormattedDate(),
+    //   round1: round,
+    //   round2: round,
+    //   round3: round,
+    // })
+    // .then((ref) => callback(ref.id));
+
+    const newQuiz = {
       name,
-      date: this.getCurrentFormattedDate(),
       round1: round,
       round2: round,
-      round3: round,
-    })
-      .then((ref) => {
-        callback(ref.id);
-      });
+      round3: round
+    };
+
+    let newQuizRef = firebase.database().ref().push();
+    newQuizRef.set(newQuiz)
+      .then(() => callback(newQuizRef.key));
   };
 
   /**
@@ -72,7 +83,9 @@ class Firebase {
    * @param {function} callback
    */
   deleteQuiz = (id, callback) => {
-    this.db.collection(`quizzes`).doc(id).delete().then(callback);
+    firebase.database().ref(id)
+      .remove()
+      .then(callback);
   };
 
 
@@ -84,8 +97,11 @@ class Firebase {
    * @param {function} callback
    */
   saveQuiz = (id, quiz, callback) => {
-    const docRef = this.db.collection('quizzes').doc(id);
-    docRef.set(quiz).then(callback);
+    // const docRef = this.db.collection('quizzes').doc(id);
+    // docRef.set(quiz).then(callback);
+    firebase.database().ref(id)
+      .set(quiz)
+      .then(callback);
   };
 
   /**
@@ -94,19 +110,30 @@ class Firebase {
    */
   getQuizzes = (callback) => {
     const quizzes = [];
-    this.db.collection('quizzes').get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
+    // this.db.collection('quizzes').get()
+    //   .then((snapshot) => {
+    //     snapshot.forEach((doc) => {
+    //       quizzes.push({
+    //         id: doc.id,
+    //         data: doc.data(),
+    //       });
+    //     });
+    //     callback(quizzes);
+    //   })
+    //   .catch((err) => {
+    //     console.error('Error getting documents', err);
+    //   });
+    firebase.database().ref().once('value')
+      .then(snapshot => {
+        snapshot.forEach(child => {
           quizzes.push({
-            id: doc.id,
-            data: doc.data(),
+            id: child.key,
+            data: child.val()
           });
         });
         callback(quizzes);
       })
-      .catch((err) => {
-        console.error('Error getting documents', err);
-      });
+      .catch(err => console.error('Error getting documents', err));
   };
 
   /**
@@ -115,14 +142,27 @@ class Firebase {
    * @param {function} callback
    */
   getQuiz = (id, callback) => {
-    this.db.collection('quizzes').doc(id).get()
-      .then((doc) => {
-        // if no doc, return no success so we can redirect
-        // else return the document data
-        if (!doc) {
+    // this.db.collection('quizzes').doc(id).get()
+    //   .then((doc) => {
+    //     // if no doc, return no success so we can redirect
+    //     // else return the document data
+    //     if (!doc) {
+    //       callback({ success: false });
+    //     } else {
+    //       callback({ success: true, data: doc.data() });
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.error('Error getting document', err);
+    //     callback({ success: false });
+    //   });
+    firebase.database().ref(id)
+      .once('value')
+      .then(snapshot => {
+        if (!snapshot.exists()) {
           callback({ success: false });
         } else {
-          callback({ success: true, data: doc.data() });
+          callback({ success: true, data: snapshot.val() });
         }
       })
       .catch((err) => {
@@ -141,7 +181,7 @@ class Firebase {
     this.getQuiz(id, (res) => {
       if (!res.data) return;
 
-      firebase.database().ref().set({
+      firebase.database().ref(LIVE_GAME_REF).set({
         quizId: id,
         date: this.getCurrentFormattedDate(),
         stage: 'join',
@@ -154,15 +194,15 @@ class Firebase {
   };
 
   /**
-   * calls the callback with all the data in the realtime db
-   * this gives us anything we need for a live game
+   * calls the callback with all the data for the current game
    * @param {function} callback
    */
   getGame = (callback) => {
-    firebase.database().ref().once('value')
+    this.liveGameRef.once('value')
       .then((snapshot) => {
-        callback(snapshot.val());
-      });
+        callback({ success: true, data: snapshot.val() });
+      })
+      .catch(err => callback({ success: false }));
   };
 
   /**
@@ -173,7 +213,7 @@ class Firebase {
    * @param {function} callback
    */
   joinGame = (teamName, teamIds, callback) => {
-    firebase.database().ref().once('value')
+    this.liveGameRef.once('value')
       .then((snapshot) => {
         // if first team, we create the new object
         const teams = snapshot.val().teams || {};
@@ -181,7 +221,7 @@ class Firebase {
           ids: teamIds,
         };
 
-        firebase.database().ref('teams').set(teams);
+        firebase.database().ref(LIVE_GAME_REF).child('teams').set(teams);
 
         // calls callback with the date and team name to
         // store in local storage for the client
@@ -201,7 +241,7 @@ class Firebase {
    * @param {function} callback
    */
   inGame = (date, callback) => {
-    firebase.database().ref().once('value')
+    this.liveGameRef.once('value')
       .then((snapshot) => {
         callback(snapshot.val().date === date);
       });
@@ -213,15 +253,17 @@ class Firebase {
    * @param {function} callback
    */
   setStage = (newStage, callback) => {
-    firebase.database().ref('stage').set(newStage).then(callback);
+    this.liveGameRef
+      .child('stage')
+      .set(newStage)
+      .then(callback);
   }
 
   /**
-   * returns a references to the live database
-   * so we can listen for changes on each page
+   * returns a references to the live game part of the database
    */
-  getDatabaseRef = () => {
-    return firebase.database().ref();
+  getLiveGameRef = () => {
+    return firebase.database().ref(LIVE_GAME_REF);
   };
 
   /**
@@ -231,7 +273,7 @@ class Firebase {
    * @param {array} answers
    */
   setTeamAnswers = (teamName, round, answers) => {
-    firebase.database().ref(`teams/${teamName}/${round}`).set(answers);
+    this.liveGameRef.child(`teams/${teamName}/${round}`).set(answers);
   };
 
   /**
@@ -242,7 +284,7 @@ class Firebase {
    */
   setStandings = (teams, round, callback) => {
     // inefficient christmas tree, but not sure if await works with firebase
-    firebase.database().ref('teams').set(teams)
+    this.liveGameRef.child('teams').set(teams)
       .then(() => {
         this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, callback);
       });
@@ -252,10 +294,9 @@ class Firebase {
    * @returns {string}
    */
   getCurrentFormattedDate = () => {
-    // this will return the date in string format
-    // this prevents it from changing in firebase
-    // and provides uniqueness to games
-    return new Date().toISOString();
+    // this will return the date in the format MM-DD-YYYY 
+    // - used for uniqueness in games
+    return new Date().toISOString().slice(0, 10);
   };
 }
 
@@ -270,3 +311,4 @@ export const withFirebase = Component => props => (
 export default Firebase;
 
 export { FirebaseContext };
+  

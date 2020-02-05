@@ -32,7 +32,9 @@ class GradingPage extends React.Component {
     // give time for clients' answers to get submitted
     this.timeout = setTimeout(() => {
       // get the round, questions, and teams to grade
-      this.firebase.getGame((game) => {
+      this.firebase.getGame((res) => {
+        if (!res.success) return;
+        const game = res.data;
         // get the round from stage, ex. round1-grading => round1
         const round = game.stage.split('-')[0];
         this.setState({
