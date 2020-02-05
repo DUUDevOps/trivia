@@ -11,9 +11,6 @@ const config = {
   appId: "1:653573216029:web:c9f655c0b7b000eddef3f4"
 };
 
-// const ADMIN_REF_NAME = "quizzes";
-// const NUM_QUESTIONS = 10;
-
 const LIVE_GAME_REF = "currentGame";
 const QUIZZES_REF = "quizzes";
 
@@ -57,16 +54,6 @@ class Firebase {
       });
     }
 
-    // create a new quiz with a random id
-    // this.db.collection('quizzes').add({
-    //   name,
-    //   date: this.getCurrentFormattedDate(),
-    //   round1: round,
-    //   round2: round,
-    //   round3: round,
-    // })
-    // .then((ref) => callback(ref.id));
-
     const newQuiz = {
       name,
       round1: round,
@@ -99,8 +86,6 @@ class Firebase {
    * @param {function} callback
    */
   saveQuiz = (id, quiz, callback) => {
-    // const docRef = this.db.collection('quizzes').doc(id);
-    // docRef.set(quiz).then(callback);
     this.quizzesRef.child(id)
       .set(quiz)
       .then(callback);
@@ -112,19 +97,6 @@ class Firebase {
    */
   getQuizzes = (callback) => {
     const quizzes = [];
-    // this.db.collection('quizzes').get()
-    //   .then((snapshot) => {
-    //     snapshot.forEach((doc) => {
-    //       quizzes.push({
-    //         id: doc.id,
-    //         data: doc.data(),
-    //       });
-    //     });
-    //     callback(quizzes);
-    //   })
-    //   .catch((err) => {
-    //     console.error('Error getting documents', err);
-    //   });
     this.quizzesRef.once('value')
       .then(snapshot => {
         snapshot.forEach(child => {
@@ -144,20 +116,6 @@ class Firebase {
    * @param {function} callback
    */
   getQuiz = (id, callback) => {
-    // this.db.collection('quizzes').doc(id).get()
-    //   .then((doc) => {
-    //     // if no doc, return no success so we can redirect
-    //     // else return the document data
-    //     if (!doc) {
-    //       callback({ success: false });
-    //     } else {
-    //       callback({ success: true, data: doc.data() });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.error('Error getting document', err);
-    //     callback({ success: false });
-    //   });
     this.quizzesRef.child(id)
       .once('value')
       .then(snapshot => {
