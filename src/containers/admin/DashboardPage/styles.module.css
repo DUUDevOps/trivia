@@ -60,6 +60,33 @@
   margin: 0px 20px 10px 20px;
 }
 
+.liveGameButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 25px 15px 25px;
+  margin: 6vh auto;
+  border-width: 5px;
+  border-color: #fff;
+  border-style: dashed;
+  border-radius: 0px;
+  width: 40vw;
+  cursor: pointer;
+  outline: none;
+  transition: 200ms;
+}
+.liveGameButton:hover,
+.liveGameButton:focus {
+  transform: scale(0.97);
+}
+
+.liveGameText {
+  font-size: 32px;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
 .quizzesContainer {
   display: flex;
   flex-flow: row wrap;

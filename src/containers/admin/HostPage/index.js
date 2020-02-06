@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
 import classNames from 'classnames';
 
 import styles from './styles.module.css';
@@ -17,15 +16,11 @@ class HostPage extends React.Component {
 
     this.firebase = props.firebase;
     this.dbRef = this.firebase.getLiveGameRef();
-    this.id = props.match.params.id;
 
     this.start = this.start.bind(this);
   }
 
   componentDidMount() {
-    // refresh the realtime db with this new host
-    this.firebase.hostQuiz(this.id);
-
     // listen for new teams to join
     this.dbRef.on('value', (snapshot) => {
       this.setState({ teams: snapshot.val().teams ? Object.keys(snapshot.val().teams) : [] });
@@ -45,10 +40,6 @@ class HostPage extends React.Component {
   }
 
   render() {
-    if (!this.id) {
-      return <Redirect to="/admin/dashboard" />;
-    }
-
     // TODO: change join/play url
 
     return (
@@ -82,7 +73,6 @@ class HostPage extends React.Component {
 }
 
 HostPage.propTypes = {
-  match: PropTypes.object,
   firebase: PropTypes.object,
 };
 

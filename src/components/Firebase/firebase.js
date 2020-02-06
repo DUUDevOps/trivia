@@ -261,11 +261,23 @@ class Firebase {
    * @returns {string}
    */
   getCurrentFormattedDate = () => {
-    // this will return the date in the format MM-DD-YYYY 
+    // this will return the date in the format MM-DD-YYYY
     // - used for uniqueness in games
     return new Date().toISOString().slice(0, 10);
   };
 }
+
+// Order of stages:
+// 1: join
+// 2: round1
+// 3: round1-grading
+// 4: round1-standings
+// 5: round2
+// 6: round2-grading
+// 7: round2-standings
+// 8: round3
+// 9: round3-grading
+// 10: round3-final standings
 
 const FirebaseContext = React.createContext(null);
 
@@ -278,4 +290,3 @@ export const withFirebase = Component => props => (
 export default Firebase;
 
 export { FirebaseContext };
-  

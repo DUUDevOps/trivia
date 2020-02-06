@@ -14,6 +14,7 @@ class HostQuestionPage extends React.Component {
 
     this.state = {
       qnum: parseInt(props.match.params.qnum),
+      roundNum: 1,
       question: {},
       questions: [],
     };
@@ -39,6 +40,7 @@ class HostQuestionPage extends React.Component {
       this.setState({
         question: questions[this.state.qnum - 1],
         questions,
+        roundNum: game.stage.substring(game.stage.length - 1, game.stage.length),
       });
     });
   }
@@ -72,6 +74,7 @@ class HostQuestionPage extends React.Component {
       <div className={styles.container}>
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
+          {`round ${this.state.roundNum}: `}
           {this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
         </div>
 

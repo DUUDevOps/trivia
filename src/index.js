@@ -34,7 +34,7 @@ ReactDOM.render(
         <Route exact path="/admin/login" component={LoginPage} />
         <AdminRoute exact path="/admin/dashboard" component={DashboardPage} />
         <AdminRoute exact path="/admin/edit/:id" component={EditPage} />
-        <AdminRoute exact path="/host/join/:id" component={HostPage} />
+        <AdminRoute exact path="/host/join" component={HostPage} />
         <AdminRoute exact path="/host/question/:qnum" component={HostQuestionPage} />
         <AdminRoute exact path="/host/grading" component={GradingPage} />
         <AdminRoute exact path="/host/standings" component={HostStandingsPage} />

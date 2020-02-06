@@ -19,6 +19,7 @@ class DashboardPage extends React.Component {
       createText: '',
       loading: false,
       deleteId: '',
+      isLiveGame: false,
     };
 
     this.firebase = props.firebase;
@@ -26,9 +27,18 @@ class DashboardPage extends React.Component {
     this.onCreate = this.onCreate.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.loadQuizzes = this.loadQuizzes.bind(this);
+    this.loadLiveGame = this.loadLiveGame.bind(this);
+    this.hostGame = this.hostGame.bind(this);
   }
 
   componentDidMount() {
+    // see if there is a live game we can reload
+    this.firebase.getGame((response) => {
+      if (response.success && response.data.stage !== 'round3-final standings') {
+        this.setState({ isLiveGame: true });
+      };
+    });
+    // get our created quizzes
     this.loadQuizzes();
   }
 
@@ -56,9 +66,48 @@ class DashboardPage extends React.Component {
     });
   }
 
-  render() {
-    // TODO: add resume game button in case of disconnect/accidental exits/token expirations
+  // hosts the current live game by going to a page based on the stage
+  loadLiveGame() {
+    this.firebase.getGame((response) => {
+      if (response.success) {
+        const stage = response.data.stage;
+        // make sure there is a stage, should always be there, but just to be safe
+        if (!stage) return;
+        // make sure game still isn't over
+        if (stage === 'round3-final standings') {
+          this.setState({ isLiveGame: false });
+          return;
+        }
+        // go to join page if we are still joining
+        if (stage === 'join') {
+          this.props.history.push('/host/join');
+          return;
+        }
+        // otherwise, the stage is separate by - with the info we need
+        const stageInfo = stage.split('-');
+        // if it is not split, then we are on the question phase
+        if (stageInfo.length === 1) {
+          this.props.history.push('/host/question/1');
+          return;
+        }
+        // otherwise, we are either grading or in the standing phase
+        if (stageInfo[1] === 'grading') {
+          this.props.history.push('/host/grading');
+        } else {
+          this.props.history.push('/host/standings');
+        }
+      }
+    });
+  }
 
+  hostGame(gameId) {
+    // refresh the realtime db with this new host
+    this.firebase.hostQuiz(gameId);
+    // go to the host page
+    this.props.history.push('/host/join');
+  }
+
+  render() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -77,6 +126,19 @@ class DashboardPage extends React.Component {
           </div>
         </div>
 
+        {this.state.isLiveGame ? (
+          <div
+            className={styles.liveGameButton}
+            role="button"
+            tabIndex={0}
+            onClick={this.loadLiveGame}
+          >
+            <div className={styles.liveGameText}>
+              resume live game
+            </div>
+          </div>
+        ) : null}
+
         <div className={styles.quizzesContainer}>
           {this.state.quizzes.map((q) => (
             <div className={styles.quizHolder} key={q.id}>
@@ -91,10 +153,12 @@ class DashboardPage extends React.Component {
                   data-tip="edit"
                   to={`/admin/edit/${q.id}`}
                 />
-                <Link
+                <i
                   className={classNames('fas fa-play', styles.quizButton)}
                   data-tip="host"
-                  to={`/host/join/${q.id}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => this.hostGame(q.id)}
                 />
                 <i
                   className={classNames('fas fa-trash-alt', styles.quizButton)}
