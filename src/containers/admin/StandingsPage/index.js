@@ -27,7 +27,7 @@ class StandingsPage extends React.Component {
 
   componentDidMount() {
     this.firebase.getGame((res) => {
-      if (!res.success) return;
+      if (!res.success || !res.data) return;
       const game = res.data;
       // create a standings array
       const standings = Object.entries(game.teams).map(([name, data]) => ({

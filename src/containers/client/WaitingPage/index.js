@@ -25,7 +25,7 @@ class WaitingPage extends React.Component {
     // then go to answer page when it does
     this.dbRef.on('value', (snapshot) => {
       const stage = snapshot.val().stage;
-      if (stage === 'round1') {
+      if (['round1', 'round2', 'round3'].includes(stage)) {
         this.props.history.push('/play/answer');
       } else if (stage.includes('-') && stage.split('-')[1].includes('standings')) {
         this.props.history.push('/play/standing');

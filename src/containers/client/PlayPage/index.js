@@ -15,9 +15,10 @@ class PlayPage extends React.Component {
     this.state = {
       team: '',
       ids: [''],
-      joinable: true,
+      joinable: false,
       error: '',
       dbExists: true,
+      currentTeam: '',
     };
 
     this.firebase = props.firebase;
@@ -25,19 +26,18 @@ class PlayPage extends React.Component {
 
     this.changeId = this.changeId.bind(this);
     this.onJoin = this.onJoin.bind(this);
+    this.onRejoin = this.onRejoin.bind(this);
   }
 
   componentDidMount() {
-    // probably temporary, might not want to immediately remove it when we load this page
-    localStorage.removeItem('game');
-
     // see if we can join the game right now
     this.firebase.getGame((game) => {
       if (!game.success) {
         this.setState({ dbExists: false });
       } else {
         this.setState({
-          joinable: game.data.stage === 'join',
+          joinable: game.data.stage !== 'round3-final standings',
+          dbExists: true,
         });
       }
     });
@@ -46,10 +46,21 @@ class PlayPage extends React.Component {
     this.dbRef.on('value', (snapshot) => {
       if (snapshot.exists()) {
         this.setState({
-          joinable: snapshot.val().stage === 'join',
+          joinable: snapshot.val().stage !== 'round3-final standings',
         });
       }
     });
+
+    // allow team to reconnect
+    const gameData = JSON.parse(localStorage.getItem('game'));
+    if (gameData) {
+      // make sure its a valid token
+      this.firebase.inGame(gameData.date, (haveAccess) => {
+        this.setState({
+          currentTeam: haveAccess ? gameData.name : '',
+        });
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -88,18 +99,53 @@ class PlayPage extends React.Component {
       if (error) {
         this.setState({ error });
       } else {
+        // remove old team
+        if (this.state.currentTeam) {
+          this.firebase.removeTeam(this.state.currentTeam);
+          localStorage.removeItem('game');
+        }
+        // join game
         this.firebase.joinGame(this.state.team, ids, (data) => {
           // localStorage can't store objects, so we stringify it
           // but this means we have to call JSON.parse each time we want to access it
           localStorage.setItem('game', JSON.stringify(data));
+          // waiting will automatically redirect it to the right page
           this.props.history.push('/play/waiting');
         });
       }
     });
   }
 
+  onRejoin() {
+    // clear token and state if we can't actually rejoin
+    const noRejoin = () => {
+      localStorage.removeItem('game');
+      this.setState({ currentTeam: '' });
+    };
+
+    // make sure token is still valid
+    const gameData = JSON.parse(localStorage.getItem('game'));
+    if (gameData) {
+      this.firebase.inGame(gameData.date, (haveAccess) => {
+        // then, see if we are still a team in the game
+        this.firebase.getGame((res) => {
+          if (!res.success) return;
+          const game = res.data;
+          const teams = game.teams ? Object.keys(game.teams) : [];
+          if (teams.includes(gameData.name)) {
+            // waiting will automatically redirect it to the right page
+            this.props.history.push('/play/waiting');
+          } else {
+            noRejoin();
+          }
+        });
+      });
+    } else {
+      noRejoin();
+    }
+  }
+
   render() {
-    // TODO: add rejoin page/option
     if (!this.state.dbExists) {
       return <Redirect to="/" />
     }
@@ -153,6 +199,11 @@ class PlayPage extends React.Component {
         {this.state.error ? (
           <div className={styles.errorText}>
             {this.state.error}
+          </div>
+        ) : this.state.joinable && this.state.currentTeam && !this.state.team ? (
+          <div className={styles.next} role="button" tabIndex={0} onClick={this.onRejoin}>
+            {`rejoin as: ${this.state.currentTeam}`}
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
           </div>
         ) : this.state.joinable ? (
           <div className={styles.next} role="button" tabIndex={0} onClick={this.onJoin}>

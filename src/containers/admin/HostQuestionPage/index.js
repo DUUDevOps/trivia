@@ -35,6 +35,11 @@ class HostQuestionPage extends React.Component {
       const game = res.data;
       // filter out the bonus if it doesn't exist
       const questions = game[game.stage].filter((q) => (q.q !== ''));
+      // redirect if invalid question number
+      if (!this.state.qnum || this.state.qnum > questions.length) {
+        this.props.history.push('/admin/dashboard');
+        return;
+      };
       // for ending the round later
       this.stage = game.stage;
       this.setState({

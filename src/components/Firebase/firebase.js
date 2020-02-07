@@ -1,5 +1,7 @@
-import firebase from 'firebase';
 import React from 'react';
+import * as firebase from 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
 
 const config = {
   apiKey: "AIzaSyARGwqdebOb043X-pjG6b18iGkJ7LDRk68",
@@ -18,7 +20,6 @@ class Firebase {
   constructor() {
     firebase.initializeApp(config);
     this.auth = firebase.auth();
-    this.db = firebase.firestore();
     this.liveGameRef = this.getLiveGameRef();
     this.quizzesRef = this.getQuizzesRef();
   }
@@ -242,6 +243,14 @@ class Firebase {
   setTeamAnswers = (teamName, round, answers) => {
     this.liveGameRef.child(`teams/${teamName}/${round}`).set(answers);
   };
+
+  /**
+   * remove a team from the live game
+   * @param {string} teamName
+   */
+  removeTeam = (teamName) => {
+    this.liveGameRef.child(`teams/${teamName}`).remove();
+  }
 
   /**
    * set the new team standings and set stage to standings
