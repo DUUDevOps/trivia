@@ -21,7 +21,7 @@
 
 .header {
   font-weight: bold;
-  font-size: 4.5vw;
+  font-size: 52px;
   margin: 3vh 3vw 2vh 3vw;
 }
 
@@ -40,7 +40,6 @@
   width: 80vw;
   margin: auto;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   font-weight: bold;

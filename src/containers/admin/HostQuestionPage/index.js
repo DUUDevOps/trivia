@@ -1,88 +1,121 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 import { Textfit } from 'react-textfit';
 
-import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
 import styles from './styles.module.css';
+import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
+import { withFirebase } from '../../../components/Firebase/firebase';
 
 class HostQuestionPage extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      questions: [
-        {
-          text: 'Who was the 1st pick in the 2019 NBA Draft?',
-          img: 'https://www.pinclipart.com/picdir/big/195-1958645_pelicans-playoff-moments-new-orleans-pelicans-clipart.png',
-        }, {
-          text: '2 + 2 = ?',
-          img: '',
-        }, {
-          text: '2 + 2 = ?',
-          img: 'https://www.usnews.com/dims4/USNEWS/1a50cbb/2147483647/thumbnail/640x420/quality/85/?url=http%3A%2F%2Fcom-usnews-beam-media.s3.amazonaws.com%2F85%2Ff1%2F19f0ed814815ade2f68071bc3164%2F190610-geometryshapes-stock.jpg',
-        }, {
-          text: 'This question will be overwhelmingly long to make sure that we can fit questions even when they are longer than any reasonable person would make them. I guess it will not be too long to keep it realistic, but still...',
-          img: '',
-        }, {
-          text: 'This question will be overwhelmingly long (with a picture) to make sure that we can fit questions even when they are longer than any reasonable person would make them. I guess it will not be too long to keep it realistic, but still...',
-          img: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/American_Beaver.jpg',
-        }, {
-          text: 'Back to normal sized questions, I guess?',
-          img: '',
-        }, {
-          text: 'Who is the oldest quarterback to ever win a Super Bowl?',
-          img: '',
-        },
-      ]
+      qnum: parseInt(props.match.params.qnum),
+      roundNum: 1,
+      question: {},
+      questions: [],
     };
+
+    this.firebase = props.firebase;
+
+    this.stage = '';
+
+    this.endRound = this.endRound.bind(this);
+  }
+
+  componentDidMount() {
+    // get the questions from the realtime db
+    // we'll use these questions for the whole round because this page
+    // will never fully reload
+    this.firebase.getGame((res) => {
+      if (!res.success) return;
+      const game = res.data;
+      // filter out the bonus if it doesn't exist
+      const questions = game[game.stage].filter((q) => (q.q !== ''));
+      // redirect if invalid question number
+      if (!this.state.qnum || this.state.qnum > questions.length) {
+        this.props.history.push('/admin/dashboard');
+        return;
+      };
+      // for ending the round later
+      this.stage = game.stage;
+      this.setState({
+        question: questions[this.state.qnum - 1],
+        questions,
+        roundNum: game.stage.substring(game.stage.length - 1, game.stage.length),
+      });
+    });
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // if the qnum changes, change the question
+    // we do this because the page will not automatically rerender when qnum changes
+    const newQnum = parseInt(nextProps.match.params.qnum);
+    if (newQnum !== prevState.qnum) {
+      return {
+        qnum: newQnum,
+        question: prevState.questions[newQnum - 1],
+      };
+    } else {
+      return prevState;
+    }
+  }
+
+  endRound() {
+    this.firebase.setStage(`${this.stage}-grading`, () => {
+      this.props.history.push('/host/grading');
+    });
   }
 
   render() {
-    if (!this.props.match.params.qnum) {
+    if (!this.state.qnum) {
       return <Redirect to="/admin/login" />;
     }
 
-    const qnum = parseInt(this.props.match.params.qnum);
-    const question = this.state.questions[qnum - 1];
-
-    return (
+    return this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
-          {`question ${qnum}`}
+          {`round ${this.state.roundNum}: `}
+          {this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
         </div>
 
         <div className={styles.questionContainer}>
-          {question.img ? (
-            <img src={question.img} alt="Question" className={styles.questionImage} draggable={false} />
+          {this.state.question.img ? (
+            <img src={this.state.question.img} alt="Question" className={styles.questionImage} draggable={false} />
           ) : null}
 
-          {question.text ? (
+          {this.state.question.q ? (
             <Textfit
               className={styles.questionText}
-              style={{ width: question.img ? '48vw' : '80vw', height: question.img ? '70vh' : '60vh' }}
+              style={{ width: this.state.question.img ? '48vw' : '80vw', height: this.state.question.img ? '70vh' : '60vh' }}
               mode="multi"
               max={70}
             >
-              {question.text}
+              {this.state.question.q}
             </Textfit>
           ) : null}
         </div>
 
-        <Link
-          className={styles.nextButton}
-          to={qnum === this.state.questions.length ? '/host/results' : `/host/question/${qnum + 1}`}
-          style={{ right: '3vw', bottom: '3vh' }}
-        >
-          {qnum === this.state.questions.length ? 'end round' : 'next'}
-          <i className={classNames('fas fa-arrow-right', styles.arrow)} />
-        </Link>
-        {qnum !== 1 ? (
+        {this.state.qnum === this.state.questions.length ? (
+          <div className={styles.nextButton} role="button" tabIndex={0} onClick={this.endRound} style={{ right: '3vw', bottom: '3vh' }}>
+            end round
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </div>
+        ) : (
+          <Link className={styles.nextButton} to={`/host/question/${this.state.qnum + 1}`} style={{ right: '3vw', bottom: '3vh' }}>
+            next
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </Link>
+        )}
+
+        {this.state.qnum !== 1 ? (
           <Link
             className={styles.nextButton}
-            to={`/host/question/${qnum - 1}`}
+            to={`/host/question/${this.state.qnum - 1}`}
             style={{ left: '3vw', bottom: '3vh' }}
           >
             <i className={classNames('fas fa-arrow-left', styles.arrow)} />
@@ -90,12 +123,14 @@ class HostQuestionPage extends React.Component {
           </Link>
         ) : null}
       </div>
-    );
+    ) : null;
   }
 }
 
 HostQuestionPage.propTypes = {
   match: PropTypes.object,
+  firebase: PropTypes.object,
+  history: PropTypes.object,
 };
 
-export default HostQuestionPage;
+export default withRouter(withFirebase(HostQuestionPage));

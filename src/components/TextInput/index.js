@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import classNames from 'classnames';
 
 import styles from './styles.module.css';
 
-const TextInput = ({ placeholder, onChange, autoFocus, value, width }) => {
+const TextInput = ({ placeholder, onChange, autoFocus, value, width, type, customStyle, id }) => {
+  // fontSize defaults to 20px if not included
   return (
     <input
       className={styles.input}
-      style={{ width }}
+      style={{
+        width: `calc(${width} - 20px)`,
+        ...customStyle,
+      }}
+      id={id}
       placeholder={placeholder}
       onChange={onChange}
-      type="text"
+      type={type || 'text'}
       autoFocus={autoFocus ? 'autofocus' : ''}
       value={value}
     />
@@ -20,11 +24,13 @@ const TextInput = ({ placeholder, onChange, autoFocus, value, width }) => {
 
 TextInput.propTypes = {
   placeholder: PropTypes.string,
-  className: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   autoFocus: PropTypes.bool,
   value: PropTypes.any,
   width: PropTypes.string,
+  type: PropTypes.string,
+  customStyle: PropTypes.object,
+  id: PropTypes.string,
 };
 
 export default TextInput;
