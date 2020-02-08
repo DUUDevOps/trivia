@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Redirect, withRouter } from 'react-router-dom';
 import classNames from 'classnames';
+import isImageUrl from 'is-image-url';
 
 import styles from './styles.module.css';
 import { withFirebase } from '../../../components/Firebase/firebase';
@@ -19,6 +20,11 @@ class EditPage extends React.Component {
       round: 'round1',
       saving: false,
       editTitle: false,
+      showImageModal: false,
+      imageUrl: '',
+      imageIndex: 0,
+      uploadingImage: false,
+      uploadError: false,
     };
 
     this.id = props.match.params.id;
@@ -27,6 +33,8 @@ class EditPage extends React.Component {
     this.setValue = this.setValue.bind(this);
     this.setTitle = this.setTitle.bind(this);
     this.save = this.save.bind(this);
+    this.uploadImage = this.uploadImage.bind(this);
+    this.removeImage = this.removeImage.bind(this);
   }
 
   componentDidMount() {
@@ -65,12 +73,50 @@ class EditPage extends React.Component {
     this.firebase.saveQuiz(this.id, this.state.quiz, () => next());
   }
 
+  uploadImage() {
+    this.setState({ uploadingImage: true });
+    // make sure we are uploading an image to the game
+    if (!isImageUrl(this.state.imageUrl)) {
+      this.setState({ uploadingImage: false, uploadError: true });
+      return;
+    }
+    // upload the image
+    this.firebase.uploadImage(this.state.imageUrl, (url, id) => {
+      if (!url) {
+        this.setState({ uploadingImage: false, uploadError: true });
+        return;
+      }
+      // update our quiz with the image
+      const quiz = JSON.parse(JSON.stringify(this.state.quiz));
+      const round = quiz[this.state.round];
+      round[this.state.imageIndex].img = url;
+      round[this.state.imageIndex].imgId = id;
+      // we save immediately because we uploaded the image
+      this.setState({
+        quiz,
+        showImageModal: false,
+        uploadingImage: false,
+      }, () => this.save(() => this.setState({ saving: false, })));
+    });
+  }
+
+  removeImage(index) {
+    // get the quiz
+    const quiz = JSON.parse(JSON.stringify(this.state.quiz));
+    const round = quiz[this.state.round];
+    // delete the image from the database
+    this.firebase.removeImage(round[index].imgId);
+    // we don't need to wait, just remove the image from our quiz
+    round[index].img = '';
+    round[index].imgId = '';
+    // save immediately because we just delted it from storage
+    this.setState({ quiz, showImageModal: false }, () => this.save(() => this.setState({ saving: false })));
+  }
+
   render() {
     if (!this.id || this.state.redirect) {
       return <Redirect to="/admin/dashboard" />
     }
-
-    // TODO: allows images to be added
 
     return this.state.quiz.name !== undefined ? (
       <div className={styles.container}>
@@ -188,21 +234,44 @@ class EditPage extends React.Component {
               </div>
             </div>
 
-            <div className={styles.pointsContainer}>
-              <TextInput
-                value={this.state.quiz[this.state.round][index].pts}
-                onChange={(e) => this.setValue(e, 'pts', index)}
-                type="number"
-                width="100%"
-                customStyle={{
-                  fontSize: '34px',
-                  lineHeight: '34px',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}
-              />
-              <div className={styles.pointsText}>
-                {this.state.quiz[this.state.round][index].pts === 1 ? 'point' : 'points'}
+            <div className={styles.centeredRow}>
+              <div className={styles.pointsContainer}>
+                <TextInput
+                  value={this.state.quiz[this.state.round][index].pts}
+                  onChange={(e) => this.setValue(e, 'pts', index)}
+                  type="number"
+                  width="100%"
+                  customStyle={{
+                    fontSize: '34px',
+                    lineHeight: '34px',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                />
+                <div className={styles.pointsText}>
+                  {this.state.quiz[this.state.round][index].pts === 1 ? 'point' : 'points'}
+                </div>
+              </div>
+
+              <div className={styles.imageContainer}>
+                {this.state.quiz[this.state.round][index].img ? (
+                  <div className={styles.imageContainer}>
+                    <img src={this.state.quiz[this.state.round][index].img} alt="Question" className={styles.image} />
+                    <i className={classNames(styles.deleteImage, 'fas fa-times')} role="button" tabIndex={0} onClick={() => this.removeImage(index)} />
+                  </div>
+                ) : (
+                  <div
+                    className={styles.imageButton}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => this.setState({ showImageModal: true, imageIndex: index, imageUrl: '' })}
+                  >
+                    <i className={classNames(styles.imageIcon, 'far fa-image')} />
+                    <div className={styles.imageText}>
+                      add image
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -219,6 +288,22 @@ class EditPage extends React.Component {
             inputValue={this.state.quiz.name}
             inputChange={this.setTitle}
             inputPlaceholder="title"
+          />
+        ) : this.state.showImageModal ? (
+          <PopUp
+            text={this.state.uploadError ? "we couldn't find the image at that url..." : 'give me image url, now...'}
+            buttonOne={{
+              text: 'add',
+              onClick: this.uploadImage,
+            }}
+            buttonTwo={{
+              text: 'nvm',
+              onClick: () => this.setState({ showImageModal: false })
+            }}
+            loading={this.state.uploadingImage}
+            inputValue={this.state.imageUrl}
+            inputChange={(e) => this.setState({ imageUrl: e.target.value, uploadError: false, })}
+            inputPlaceholder="image url"
           />
         ) : null}
       </div>

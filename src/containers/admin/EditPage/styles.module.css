@@ -133,6 +133,19 @@
   align-items: center;
 }
 
+.inputText {
+  font-size: 26px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.centeredRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .pointsContainer {
   display: flex;
   flex-direction: column;
@@ -147,10 +160,67 @@
   margin-top: 6px;
 }
 
-.inputText {
-  font-size: 26px;
-  font-weight: bold;
-  margin-right: 10px;
+.imageButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 80px;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.7);
+  border-style: solid;
+  border-radius: 6px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.7);
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 200ms;
+}
+.imageButton:hover {
+  border-color:rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.imageIcon {
+  font-size: 40px;
+}
+
+.imageText {
+  font-size: 16px;
+  text-align: center;
+}
+
+.imageContainer {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  height: 100%;
+}
+
+.image {
+  object-fit: contain;
+  width: 100px;
+  height: 100px;
+}
+
+.deleteImage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  height: 20px;
+  width: 20px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  transition: 200ms;
 }
 
 @media only screen and (max-width: 800px) {

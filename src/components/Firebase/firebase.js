@@ -2,6 +2,7 @@ import React from 'react';
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
+import cloudinary from 'cloudinary/lib/cloudinary';
 
 const config = {
   apiKey: "AIzaSyARGwqdebOb043X-pjG6b18iGkJ7LDRk68",
@@ -22,6 +23,12 @@ class Firebase {
     this.auth = firebase.auth();
     this.liveGameRef = this.getLiveGameRef();
     this.quizzesRef = this.getQuizzesRef();
+
+    cloudinary.config({
+      cloud_name: 'db5gwfiow',
+      api_key: '346544944152446',
+      api_secret: process.env.REACT_APP_CLOUDINARY_API_SECRET,
+    });
   }
 
   /**
@@ -52,6 +59,7 @@ class Firebase {
         q: '',
         a: '',
         img: '',
+        imgId: '',
         pts: 1,
       });
     }
@@ -78,7 +86,6 @@ class Firebase {
       .remove()
       .then(callback);
   };
-
 
   /**
    * save a whole quiz
@@ -222,7 +229,7 @@ class Firebase {
   }
 
   /**
-   * returns a references to the live game part of the database
+   * returns a reference to the live game part of the database
    */
   getLiveGameRef = () => {
     return firebase.database().ref(LIVE_GAME_REF);
@@ -265,6 +272,28 @@ class Firebase {
       .then(() => {
         this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, callback);
       });
+  };
+
+  /**
+  * upload a image to firebase storage and get the url
+  * @param {string} imageUrl
+  * @param {function} callback
+  */
+  uploadImage = (imageUrl, callback) => {
+    // we want to take an image url hosted somewhere else
+    // and then host it on cloudinary and get our own url
+    cloudinary.uploader.upload(imageUrl, (result) => {
+      // return the url to show the image, and uniqueId to delete it if needed later
+      callback(result.secure_url, result.public_id)
+    });
+  };
+
+  /**
+   * removes an image from firebase storage
+   * @param {string} imageId
+   */
+  removeImage = (imageId) => {
+    cloudinary.uploader.destroy(imageId);
   };
 
   /**
