@@ -94,37 +94,19 @@
   font-size: 24px;
 }
 
-.gradeButton {
-  width: calc(4vw - 10px);
-  height: calc(4vw - 10px);
-  margin: auto 1vw;
-  border: 5px solid #fff;
-  border-radius: 6px;
+.pointsContainer {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: #141e32;
-  outline: none;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: 200ms;
-}
-.gradeButton:hover {
-  opacity: 1;
-  transform: scale(0.95);
+  width: 15vw;
 }
 
-.selectedButton {
-  opacity: 1;
-  background-color: #fff;
-}
-
-.gradeIcon {
-  color: #fff;
-}
-
-.selectedIcon {
-  color: #141e32;
+.pointsText {
+  font-size: 2.7vw;
+  font-weight: bold;
+  opacity: 0.8;
+  margin-left: 1.5vw;
 }
 
 .divider {

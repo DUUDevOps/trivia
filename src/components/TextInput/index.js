@@ -3,11 +3,16 @@ import PropTypes from 'prop-types';
 
 import styles from './styles.module.css';
 
-const TextInput = ({ placeholder, onChange, autoFocus, value, width, type }) => {
+const TextInput = ({ placeholder, onChange, autoFocus, value, width, type, customStyle, id }) => {
+  // fontSize defaults to 20px if not included
   return (
     <input
       className={styles.input}
-      style={{ width: `calc(${width} - 20px)` }}
+      style={{
+        width: `calc(${width} - 20px)`,
+        ...customStyle,
+      }}
+      id={id}
       placeholder={placeholder}
       onChange={onChange}
       type={type || 'text'}
@@ -24,6 +29,8 @@ TextInput.propTypes = {
   value: PropTypes.any,
   width: PropTypes.string,
   type: PropTypes.string,
+  customStyle: PropTypes.object,
+  id: PropTypes.string,
 };
 
 export default TextInput;

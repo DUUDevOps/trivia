@@ -52,6 +52,7 @@ class Firebase {
         q: '',
         a: '',
         img: '',
+        pts: 1,
       });
     }
 

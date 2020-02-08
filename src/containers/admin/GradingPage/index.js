@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { withFirebase } from '../../../components/Firebase/firebase';
+import TextInput from '../../../components/TextInput';
 import styles from './styles.module.css';
 
 class GradingPage extends React.Component {
@@ -44,8 +45,14 @@ class GradingPage extends React.Component {
           teamNames: Object.keys(game.teams),
           currentTeamNum: 0,
           // 11 false in case of bonus, only will display ten if no, and last false will not matter
-          teamCorrects: [false, false, false, false, false, false, false, false, false, false, false],
+          teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
           round,
+        }, () => {
+          // select the first input after each question
+          const input = document.getElementById('id0');
+          setTimeout(() => {
+            input.select();
+          }, 0);
         });
       });
     }, 2000);
@@ -67,22 +74,31 @@ class GradingPage extends React.Component {
     clearTimeout(this.timeout);
   }
 
-  // either true or false in val
+  // points values in val
   changeGrade(i, val) {
     const teamCorrects = [...this.state.teamCorrects];
     teamCorrects[i] = val;
     this.setState({ teamCorrects });
   }
 
-  nextTeam() {
-    // add one point for each correct answer
-    this.currentRoundTeamScores.push(this.state.teamCorrects.filter(Boolean).length);
+  nextTeam(e) {
+    e.preventDefault();
+
+    // add points for each answer
+    // reduce just sums up all points given for each question
+    this.currentRoundTeamScores.push(this.state.teamCorrects.reduce((accumulator, currentValue) => (accumulator + currentValue)));
 
     const currentTeamNum = this.state.currentTeamNum + 1;
     // keep repeating if we have teams left
     if (currentTeamNum < this.state.teamNames.length) {
+      // select the first input after each question
+      const input = document.getElementById('id0');
+      setTimeout(() => {
+        input.select();
+      }, 0);
+      // set next team
       this.setState({
-        teamCorrects: [false, false, false, false, false, false, false, false, false, false, false],
+        teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         currentTeamNum,
       }, () => window.scrollTo(0, 0));
     } else {
@@ -122,61 +138,66 @@ class GradingPage extends React.Component {
           </div>
         </div>
 
-        <div className={styles.gradingContainer}>
-          <div className={styles.divider} />
+        <form onSubmit={this.nextTeam}>
+          <div className={styles.gradingContainer}>
+            <div className={styles.divider} />
 
-          {this.state.questions.map((q, i) => (
-            <div key={i}>
-              <div className={styles.gradeContainer}>
-                <div className={styles.showButton} role="button" tabIndex={0} onClick={() => this.setState({ showQuestion: i })}>
-                  <i className={classNames(styles.questionIcon, 'fas fa-question')} />
-                  <div className={styles.viewText}>
-                    View
+            {this.state.questions.map((q, i) => (
+              <div key={i}>
+                <div className={styles.gradeContainer}>
+                  <div className={styles.showButton} role="button" tabIndex={1} onClick={() => this.setState({ showQuestion: i })}>
+                    <i className={classNames(styles.questionIcon, 'fas fa-question')} />
+                    <div className={styles.viewText}>
+                      View
+                    </div>
+                  </div>
+
+                  <div className={styles.answer}>
+                    {q.a}
+                  </div>
+                  <div className={styles.answer} style={{ marginLeft: '5vw' }}>
+                    {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
+                      && this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i]
+                        ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i] : 'no answer'}
+                  </div>
+
+                  <div className={styles.pointsContainer}>
+                    <TextInput
+                      value={this.state.teamCorrects[i]}
+                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.pts))}
+                      type="number"
+                      width="6vw"
+                      id={`id${i}`}
+                      customStyle={{
+                        fontSize: '3vw',
+                        lineHeight: '3vw',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                      }}
+                    />
+                    <div className={styles.pointsText}>
+                      {`/ ${q.pts}`}
+                    </div>
                   </div>
                 </div>
 
-                <div className={styles.answer}>
-                  {q.a}
-                </div>
-                <div className={styles.answer} style={{ marginLeft: '5vw' }}>
-                  {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
-                    && this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i]
-                      ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i] : 'no answer'}
-                </div>
-
-                <div
-                  className={classNames(styles.gradeButton, { [styles.selectedButton]: this.state.teamCorrects[i] })}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => this.changeGrade(i, true)}
-                >
-                  <i className={classNames(styles.gradeIcon, 'fas fa-check', { [styles.selectedIcon]: this.state.teamCorrects[i] })} style={{ fontSize: '2vw' }} />
-                </div>
-                <div
-                  className={classNames(styles.gradeButton, { [styles.selectedButton]: !this.state.teamCorrects[i] })}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => this.changeGrade(i, false)}
-                >
-                  <i className={classNames(styles.gradeIcon, 'fas fa-times', { [styles.selectedIcon]: !this.state.teamCorrects[i] })} style={{ fontSize: '2.4vw' }} />
-                </div>
+                <div className={styles.divider} />
               </div>
+            ))}
+          </div>
 
-              <div className={styles.divider} />
-            </div>
-          ))}
-        </div>
-
-        <div
-          className={styles.nextButton}
-          role="button"
-          tabIndex={0}
-          onClick={this.nextTeam}
-          style={{ right: '3vw', bottom: '3vh' }}
-        >
-          {this.state.currentTeamNum + 1 < this.state.teamNames.length ? 'next' : 'standings'}
-          <i className={classNames('fas fa-arrow-right', styles.arrow)} />
-        </div>
+          <div
+            className={styles.nextButton}
+            role="button"
+            tabIndex={0}
+            onClick={this.nextTeam}
+            style={{ right: '3vw', bottom: '3vh' }}
+          >
+            {this.state.currentTeamNum + 1 < this.state.teamNames.length ? 'next' : 'standings'}
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </div>
+          <input type="submit" style={{ opacity: 0, display: 'none' }} />
+        </form>
 
         {this.state.showQuestion !== -1 ? (
           <div className={styles.modal}>

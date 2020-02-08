@@ -44,8 +44,10 @@ class EditPage extends React.Component {
     const round = quiz[this.state.round];
     if (type === 'q') {
       round[index].q = e.target.value;
-    } else {
+    } else if (type === 'a') {
       round[index].a = e.target.value;
+    } else {
+      round[index].pts = Math.max(e.target.value, 0);
     }
     this.setState({ quiz });
   }
@@ -183,6 +185,24 @@ class EditPage extends React.Component {
                   onChange={(e) => this.setValue(e, 'a', index)}
                   width="100%"
                 />
+              </div>
+            </div>
+
+            <div className={styles.pointsContainer}>
+              <TextInput
+                value={this.state.quiz[this.state.round][index].pts}
+                onChange={(e) => this.setValue(e, 'pts', index)}
+                type="number"
+                width="100%"
+                customStyle={{
+                  fontSize: '34px',
+                  lineHeight: '34px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}
+              />
+              <div className={styles.pointsText}>
+                {this.state.quiz[this.state.round][index].pts === 1 ? 'point' : 'points'}
               </div>
             </div>
           </div>
