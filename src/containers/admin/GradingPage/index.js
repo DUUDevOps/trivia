@@ -40,7 +40,7 @@ class GradingPage extends React.Component {
         const round = game.stage.split('-')[0];
         this.setState({
           // filter out no bonus
-          questions: game[round].filter((q) => (q.q !== '')),
+          questions: game[round].filter((question) => (question.questionText !== '')),
           teams: game.teams,
           teamNames: Object.keys(game.teams),
           currentTeamNum: 0,

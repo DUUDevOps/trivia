@@ -89,8 +89,8 @@ class EditPage extends React.Component {
       // update our quiz with the image
       const quiz = JSON.parse(JSON.stringify(this.state.quiz));
       const round = quiz[this.state.round];
-      round[this.state.imageIndex].img = url;
-      round[this.state.imageIndex].imgId = id;
+      round[this.state.imageIndex].image = url;
+      round[this.state.imageIndex].imageId = id;
       // we save immediately because we uploaded the image
       this.setState({
         quiz,
@@ -107,8 +107,8 @@ class EditPage extends React.Component {
     // delete the image from the database
     this.firebase.removeImage(round[index].imgId);
     // we don't need to wait, just remove the image from our quiz
-    round[index].img = '';
-    round[index].imgId = '';
+    round[index].image = '';
+    round[index].imageId = '';
     // save immediately because we just delted it from storage
     this.setState({ quiz, showImageModal: false }, () => this.save(() => this.setState({ saving: false })));
   }
