@@ -43,6 +43,7 @@ class EditPage extends React.Component {
         this.setState({ redirect: true });
       } else {
         this.setState({ quiz: res.data });
+        console.log(res.data);
       }
     });
   }
@@ -51,11 +52,11 @@ class EditPage extends React.Component {
     const quiz = JSON.parse(JSON.stringify(this.state.quiz));
     const round = quiz[this.state.round];
     if (type === 'q') {
-      round[index].q = e.target.value;
+      round[index].questionText= e.target.value;
     } else if (type === 'a') {
-      round[index].a = e.target.value;
+      round[index].answer = e.target.value;
     } else {
-      round[index].pts = Math.max(e.target.value, 0);
+      round[index].points = Math.max(e.target.value, 0);
     }
     this.setState({ quiz });
   }
@@ -105,7 +106,7 @@ class EditPage extends React.Component {
     const quiz = JSON.parse(JSON.stringify(this.state.quiz));
     const round = quiz[this.state.round];
     // delete the image from the database
-    this.firebase.removeImage(round[index].imgId);
+    this.firebase.removeImage(round[index].imageId);
     // we don't need to wait, just remove the image from our quiz
     round[index].image = '';
     round[index].imageId = '';
@@ -249,14 +250,14 @@ class EditPage extends React.Component {
                   }}
                 />
                 <div className={styles.pointsText}>
-                  {this.state.quiz[this.state.round][index].pts === 1 ? 'point' : 'points'}
+                  {this.state.quiz[this.state.round][index].points === 1 ? 'point' : 'points'}
                 </div>
               </div>
 
               <div className={styles.imageContainer}>
-                {this.state.quiz[this.state.round][index].img ? (
+                {this.state.quiz[this.state.round][index].image ? (
                   <div className={styles.imageContainer}>
-                    <img src={this.state.quiz[this.state.round][index].img} alt="Question" className={styles.image} />
+                    <img src={this.state.quiz[this.state.round][index].image} alt="Question" className={styles.image} />
                     <i className={classNames(styles.deleteImage, 'fas fa-times')} role="button" tabIndex={0} onClick={() => this.removeImage(index)} />
                   </div>
                 ) : (

@@ -84,18 +84,18 @@ class HostQuestionPage extends React.Component {
         </div>
 
         <div className={styles.questionContainer}>
-          {this.state.question.img ? (
-            <img src={this.state.question.img} alt="Question" className={styles.questionImage} draggable={false} />
+          {this.state.question.image? (
+            <img src={this.state.question.image} alt="Question" className={styles.questionImage} draggable={false} />
           ) : null}
 
-          {this.state.question.q ? (
+          {this.state.question.questionText ? (
             <Textfit
               className={styles.questionText}
-              style={{ width: this.state.question.img ? '48vw' : '80vw', height: this.state.question.img ? '70vh' : '60vh' }}
+              style={{ width: this.state.question.image ? '48vw' : '80vw', height: this.state.question.image ? '70vh' : '60vh' }}
               mode="multi"
               max={70}
             >
-              {this.state.question.q}
+              {this.state.question.questionText}
             </Textfit>
           ) : null}
         </div>
