@@ -8,17 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [8.x, 10.x, 12.x]
 
     steps:
     - uses: actions/checkout@v2
     - name: Use Node ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '10.x'
     - run: npm i
     - run: npm run build
     - name: Deploy
