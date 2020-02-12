@@ -24,6 +24,7 @@ jobs:
       run: |
         git config --global user.name "Dylan Powers"
         git config --global user.email "ddp19@duke.edu"
+        git remote set-url origin https://github.com/DUUDevOps/trivia.git
     - run: npm run deploy 
 
 
