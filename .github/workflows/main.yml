@@ -20,11 +20,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
-    - name: Configure GH Credentials
-      run: |
-        git config --global user.name "Dylan Powers"
-        git config --global user.email "ddp19@duke.edu"
-        git remote set-url origin https://github.com/DUUDevOps/trivia.git
-    - run: npm run deploy 
-
-
+    - run: npm run build
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.DEPLOY_SECRET }}
+        publish_dir: ./build
