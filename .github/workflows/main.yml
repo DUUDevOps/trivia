@@ -20,6 +20,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
+    - name: Configure GH Credentials
+      run: |
+        git config --global user.name "Dylan Powers"
+        git config --global user.email "ddp19@duke.edu"
     - run: npm run deploy 
 
 
