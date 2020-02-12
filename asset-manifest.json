@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/trivia/static/css/main.e3ac8656.chunk.css",
+    "main.css": "/trivia/static/css/main.8ccd96b9.chunk.css",
     "main.js": "/trivia/static/js/main.fa84236e.chunk.js",
     "main.js.map": "/trivia/static/js/main.fa84236e.chunk.js.map",
     "runtime-main.js": "/trivia/static/js/runtime-main.e7fbfa86.js",
@@ -8,16 +8,16 @@
     "static/js/2.5d98a51c.chunk.js": "/trivia/static/js/2.5d98a51c.chunk.js",
     "static/js/2.5d98a51c.chunk.js.map": "/trivia/static/js/2.5d98a51c.chunk.js.map",
     "index.html": "/trivia/index.html",
-    "precache-manifest.d37cbc8440c44be2ba70e3d8e1b087dc.js": "/trivia/precache-manifest.d37cbc8440c44be2ba70e3d8e1b087dc.js",
+    "precache-manifest.172046be9ebec5c1fb988cf4bdcfe1ee.js": "/trivia/precache-manifest.172046be9ebec5c1fb988cf4bdcfe1ee.js",
     "service-worker.js": "/trivia/service-worker.js",
-    "static/css/main.e3ac8656.chunk.css.map": "/trivia/static/css/main.e3ac8656.chunk.css.map",
+    "static/css/main.8ccd96b9.chunk.css.map": "/trivia/static/css/main.8ccd96b9.chunk.css.map",
     "static/js/2.5d98a51c.chunk.js.LICENSE": "/trivia/static/js/2.5d98a51c.chunk.js.LICENSE",
     "static/media/DukeNiteLogo.png": "/trivia/static/media/DukeNiteLogo.b3375bd4.png"
   },
   "entrypoints": [
     "static/js/runtime-main.e7fbfa86.js",
     "static/js/2.5d98a51c.chunk.js",
-    "static/css/main.e3ac8656.chunk.css",
+    "static/css/main.8ccd96b9.chunk.css",
     "static/js/main.fa84236e.chunk.js"
   ]
 }
