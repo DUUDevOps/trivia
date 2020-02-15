@@ -38,7 +38,7 @@ class AnswerPage extends React.Component {
       }
 
       // add an empty answer for each question
-      const answers = [];
+      let answers = [];
       for (let i = 0; i < num; i++) {
         answers.push('');
       }
@@ -53,6 +53,17 @@ class AnswerPage extends React.Component {
         stage = 'round 3';
       }
 
+      // get the stored string, and make sure it exists
+      const storedString = localStorage.getItem('trivia-answers');
+      if (storedString) {
+        // make the array from the string
+        const savedAnswers = JSON.parse(storedString);
+        // make sure it has the right number of answers
+        if (savedAnswers && savedAnswers.length === answers.length) {
+          answers = savedAnswers;
+        }
+      }
+
       this.setState({ answers, stage });
     });
 
@@ -60,7 +71,10 @@ class AnswerPage extends React.Component {
     this.dbRef.on('value', (snapshot) => {
       const stage = snapshot.val().stage;
       if (['round1-grading', 'round2-grading', 'round3-grading'].includes(stage)) {
+        // submit answers to db
         this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.round, this.state.answers);
+        // remove answers because we just submitted
+        localStorage.removeItem('trivia-answers');
         this.props.history.push('/play/waiting');
       }
     });
@@ -73,7 +87,10 @@ class AnswerPage extends React.Component {
   changeAnswer(e, index) {
     const answers = [...this.state.answers];
     answers[index] = e.target.value;
-    this.setState({ answers });
+    this.setState({ answers }, () => {
+      // store our answers, have to stringify because localstorage can't store an array
+      localStorage.setItem('trivia-answers', JSON.stringify(answers));
+    });
   }
 
   render() {

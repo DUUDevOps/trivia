@@ -54,11 +54,13 @@ class StandingsPage extends React.Component {
       // display the standings
       // this.state.stage will either be standings or final standings
       // this.round is used to start next round
+      // if game is over, we can pretend to reveal standings again
       const stage = game.stage === 'finished' ? 'round3-final standings'.split('-') : game.stage.split('-');
       this.round = stage[0];
       this.setState({
         standings,
         stage: stage[1],
+        // revealing top 5 at max
         numberToReveal: Math.min(5, standings.length),
       });
     });
