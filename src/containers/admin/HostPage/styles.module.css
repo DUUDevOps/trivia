@@ -27,6 +27,7 @@
 
 .instructText {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   padding: 5px 25px 15px 25px;
   margin: 6vh auto;
@@ -34,7 +35,7 @@
   border-color: #fff;
   border-style: dashed;
   border-radius: 0px;
-  width: 40vw;
+  width: 50vw;
   font-size: 3vw;
 }
 
