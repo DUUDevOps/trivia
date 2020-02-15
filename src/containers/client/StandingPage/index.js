@@ -91,7 +91,7 @@ class StandingPage extends React.Component {
         diffTeam,
         // if someone else shares the place with us, we're tied
         tied: standings.filter((s) => (s.place === place)).length > 1,
-        stage: game.stage.split('-')[1],
+        stage: game.stage === 'finished' ? 'finished' : game.stage.split('-')[1],
       });
     });
 
@@ -100,6 +100,8 @@ class StandingPage extends React.Component {
       const stage = snapshot.val().stage;
       if (['round2', 'round3'].includes(stage)) {
         this.props.history.push('/play/answer');
+      } else if (stage === 'finished') {
+        this.setState({ stage: 'finished' });
       }
     });
   }
@@ -110,13 +112,19 @@ class StandingPage extends React.Component {
   }
 
   render() {
-    return this.state.stage ? (
+    return this.state.stage ? this.state.stage !== 'final standings' ? (
       <div className={styles.container}>
         <div className={styles.placeText}>
-          {`${this.state.stage === 'final standings' ? 'you finished' : "you're"} ${this.state.tied ? 'tied for' : 'in'} ${this.state.place}${getPlaceText(this.state.place)} place with ${this.state.score} ${this.state.score === 1 ? 'correct' : 'corrects'}`}
+          {`${this.state.stage === 'finished' ? 'you finished' : "you're"} ${this.state.tied ? 'tied for' : 'in'} ${this.state.place}${getPlaceText(this.state.place)} place with ${this.state.score} ${this.state.score === 1 ? 'correct' : 'corrects'}`}
         </div>
         <div className={styles.descText}>
           {this.state.diff === 0 ? 'tied with everyone else' : `${this.state.diff} ${this.state.diff === 1 ? 'correct' : 'corrects'} ${this.state.place === 1 ? 'ahead of' : 'behind'} ${this.state.diffTeam}`}
+        </div>
+      </div>
+    ) : (
+      <div className={styles.container}>
+        <div className={styles.placeText}>
+          the host has the final standings
         </div>
       </div>
     ) : null;

@@ -317,6 +317,7 @@ class Firebase {
 // 8: round3
 // 9: round3-grading
 // 10: round3-final standings
+// 11: finished
 
 const FirebaseContext = React.createContext(null);
 

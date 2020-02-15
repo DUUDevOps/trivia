@@ -36,7 +36,7 @@ class PlayPage extends React.Component {
         this.setState({ dbExists: false });
       } else {
         this.setState({
-          joinable: game.data.stage !== 'round3-final standings',
+          joinable: game.data.stage !== 'finished',
           dbExists: true,
         });
       }
@@ -46,7 +46,7 @@ class PlayPage extends React.Component {
     this.dbRef.on('value', (snapshot) => {
       if (snapshot.exists()) {
         this.setState({
-          joinable: snapshot.val().stage !== 'round3-final standings',
+          joinable: snapshot.val().stage !== 'finished',
         });
       }
     });
