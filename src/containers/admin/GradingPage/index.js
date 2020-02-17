@@ -40,7 +40,7 @@ class GradingPage extends React.Component {
         const round = game.stage.split('-')[0];
         this.setState({
           // filter out no bonus
-          questions: game[round].filter((q) => (q.q !== '')),
+          questions: game[round].filter((question) => (question.questionText !== '')),
           teams: game.teams,
           teamNames: Object.keys(game.teams),
           currentTeamNum: 0,
@@ -153,7 +153,7 @@ class GradingPage extends React.Component {
                   </div>
 
                   <div className={styles.answer}>
-                    {q.a}
+                    {q.answer}
                   </div>
                   <div className={styles.answer} style={{ marginLeft: '5vw' }}>
                     {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
@@ -164,7 +164,7 @@ class GradingPage extends React.Component {
                   <div className={styles.pointsContainer}>
                     <TextInput
                       value={this.state.teamCorrects[i]}
-                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.pts))}
+                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.points))}
                       type="number"
                       width="6vw"
                       id={`id${i}`}
@@ -176,7 +176,7 @@ class GradingPage extends React.Component {
                       }}
                     />
                     <div className={styles.pointsText}>
-                      {`/ ${q.pts}`}
+                      {`/ ${q.points}`}
                     </div>
                   </div>
                 </div>
@@ -202,8 +202,8 @@ class GradingPage extends React.Component {
         {this.state.showQuestion !== -1 ? (
           <div className={styles.modal}>
             <div className={styles.popUp}>
-              {this.state.questions[this.state.showQuestion].img ? (
-                <img src={this.state.questions[this.state.showQuestion].img} alt="Question" className={styles.showImage} />
+              {this.state.questions[this.state.showQuestion].image ? (
+                <img src={this.state.questions[this.state.showQuestion].image} alt="Question" className={styles.showImage} />
               ) : null}
               <div className={styles.showText}>
                 {this.state.questions[this.state.showQuestion].q}
