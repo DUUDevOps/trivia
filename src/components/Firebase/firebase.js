@@ -35,6 +35,7 @@ class Firebase {
    * @param {string} email
    * @param {string} password
    * @param {function} callback
+   * 
    */
   signInWithEmail = (email, password, callback) => {
     this.auth.signInWithEmailAndPassword(email, password)

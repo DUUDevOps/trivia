@@ -43,7 +43,6 @@ class EditPage extends React.Component {
         this.setState({ redirect: true });
       } else {
         this.setState({ quiz: res.data });
-        console.log(res.data);
       }
     });
   }
