@@ -7,6 +7,8 @@ import { withFirebase } from '../../../components/Firebase/firebase';
 import TextInput from '../../../components/TextInput';
 import styles from './styles.module.css';
 
+const FIRST_ELEMENT_ID = 'id0';
+
 class GradingPage extends React.Component {
   constructor(props) {
     super(props);
@@ -27,6 +29,7 @@ class GradingPage extends React.Component {
 
     this.changeGrade = this.changeGrade.bind(this);
     this.nextTeam = this.nextTeam.bind(this);
+    this.updateTeamScore = this.updateTeamScore.bind(this);
   }
 
   componentDidMount() {
@@ -40,7 +43,7 @@ class GradingPage extends React.Component {
         const round = game.stage.split('-')[0];
         this.setState({
           // filter out no bonus
-          questions: game[round].filter((q) => (q.q !== '')),
+          questions: game[round].filter((question) => (question.questionText !== '')),
           teams: game.teams,
           teamNames: Object.keys(game.teams),
           currentTeamNum: 0,
@@ -81,40 +84,71 @@ class GradingPage extends React.Component {
     this.setState({ teamCorrects });
   }
 
+  updateTeamScore(teamName) {
+    const teams = JSON.parse(JSON.stringify(this.state.teams));
+    teams[teamName].questionScores = this.state.teamCorrects;
+    return teams;
+  }
+
+  prevTeam(e) {
+    e.preventDefault();
+
+    // select the first text box
+    setTimeout(() => {
+      document.getElementById(FIRST_ELEMENT_ID).select();
+    }, 0);
+
+    // save the current team score
+    const updatedTeams = this.updateTeamScore(this.state.teamNames[this.state.currentTeamNum]);
+    const prevTeamNum = this.state.currentTeamNum - 1;
+    const prevTeamName = this.state.teamNames[prevTeamNum];
+
+    const prevTeamScores = updatedTeams[prevTeamNum].questionScores;
+
+    this.setState({
+      teamCorrects: prevTeamScores,
+      currentTeamNum: prevTeamNum,
+      teams: updatedTeams
+    });
+  }
+
   nextTeam(e) {
     e.preventDefault();
 
-    // add points for each answer
-    // reduce just sums up all points given for each question
-    this.currentRoundTeamScores.push(this.state.teamCorrects.reduce((accumulator, currentValue) => (accumulator + currentValue)));
+    const updatedTeams = this.updateTeamScore(this.state.teamNames[this.state.currentTeamNum]);
 
-    const currentTeamNum = this.state.currentTeamNum + 1;
+    const nextTeamNum = this.state.currentTeamNum + 1;
     // keep repeating if we have teams left
-    if (currentTeamNum < this.state.teamNames.length) {
+    if (nextTeamNum < this.state.teamNames.length) {
       // select the first input after each question
-      const input = document.getElementById('id0');
+      const input = document.getElementById(FIRST_ELEMENT_ID);
       setTimeout(() => {
         input.select();
       }, 0);
-      // set next team
+       
+      // it is possible that we went back and now we are going forward again, so check if we have
+      // already graded some questions
+      const nextTeamName = this.state.teamNames[nextTeamNum];
+      const nextTeamCorrects = updatedTeams[nextTeamName].questionScores || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
       this.setState({
-        teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        currentTeamNum,
+        teamCorrects: nextTeamCorrects,
+        currentTeamNum: nextTeamNum,
+        teams: updatedTeams
       }, () => window.scrollTo(0, 0));
     } else {
       // otherwise save the scores
-      const teams = JSON.parse(JSON.stringify(this.state.teams));
       for (let i = 0; i < this.state.teamNames.length; i++) {
         const name = this.state.teamNames[i];
         // add to the current score if possible
-        let score = teams[name].score || 0;
-        score += this.currentRoundTeamScores[i];
-        teams[name].score = score;
+        let score = updatedTeams[name].score || 0;
+        score += updatedTeams[name].questionScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
+        updatedTeams[name].score = score;
       }
 
       // after setting standings, then go to the leaderboard/standings page
       // callback makes sure standings are set before we try to show them
-      this.firebase.setStandings(teams, this.state.round, () => {
+      this.firebase.setStandings(updatedTeams, this.state.round, () => {
         this.props.history.push('/host/standings');
       });
     }
@@ -126,7 +160,7 @@ class GradingPage extends React.Component {
     return this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <div className={styles.header}>
-          {`team ${this.state.currentTeamNum + 1}/${this.state.teamNames.length}`}
+          {`team ${this.state.teamNames[this.state.currentTeamNum]}`}
         </div>
 
         <div className={styles.headerContainer}>
@@ -153,7 +187,7 @@ class GradingPage extends React.Component {
                   </div>
 
                   <div className={styles.answer}>
-                    {q.a}
+                    {q.answer}
                   </div>
                   <div className={styles.answer} style={{ marginLeft: '5vw' }}>
                     {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
@@ -164,7 +198,7 @@ class GradingPage extends React.Component {
                   <div className={styles.pointsContainer}>
                     <TextInput
                       value={this.state.teamCorrects[i]}
-                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.pts))}
+                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.points))}
                       type="number"
                       width="6vw"
                       id={`id${i}`}
@@ -176,7 +210,7 @@ class GradingPage extends React.Component {
                       }}
                     />
                     <div className={styles.pointsText}>
-                      {`/ ${q.pts}`}
+                      {`/ ${q.points}`}
                     </div>
                   </div>
                 </div>
@@ -185,6 +219,19 @@ class GradingPage extends React.Component {
               </div>
             ))}
           </div>
+
+          {this.state.currentTeamNum > 0 ? (
+            <div 
+              className={styles.nextButton}
+              role="button"
+              tabIndex={1}
+              onClick={this.prevTeam}
+              style={{ left: '3vw', bottom: '3vh' }}
+            >
+              <i className={classNames('fas fa-arrow-left', styles.arrow)} />
+              back
+            </div>
+          ) : null}
 
           <div
             className={styles.nextButton}
@@ -202,8 +249,8 @@ class GradingPage extends React.Component {
         {this.state.showQuestion !== -1 ? (
           <div className={styles.modal}>
             <div className={styles.popUp}>
-              {this.state.questions[this.state.showQuestion].img ? (
-                <img src={this.state.questions[this.state.showQuestion].img} alt="Question" className={styles.showImage} />
+              {this.state.questions[this.state.showQuestion].image ? (
+                <img src={this.state.questions[this.state.showQuestion].image} alt="Question" className={styles.showImage} />
               ) : null}
               <div className={styles.showText}>
                 {this.state.questions[this.state.showQuestion].q}

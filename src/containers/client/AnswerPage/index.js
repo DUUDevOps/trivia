@@ -33,7 +33,7 @@ class AnswerPage extends React.Component {
       this.round = game.stage;
       // see if there is a bonus question for this round
       // if so add an extra answer field
-      if (game[game.stage][10].q) {
+      if (game[game.stage][10].questionText) {
         num += 1;
       }
 

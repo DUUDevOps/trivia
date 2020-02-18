@@ -35,6 +35,7 @@ class Firebase {
    * @param {string} email
    * @param {string} password
    * @param {function} callback
+   * 
    */
   signInWithEmail = (email, password, callback) => {
     this.auth.signInWithEmailAndPassword(email, password)
@@ -56,11 +57,11 @@ class Firebase {
     const round = [];
     for (let i = 0; i < 11; i++) {
       round.push({
-        q: '',
-        a: '',
-        img: '',
-        imgId: '',
-        pts: 1,
+        questionText: '',
+        answer: '',
+        image: '',
+        imageId: '',
+        points: 1,
       });
     }
 
