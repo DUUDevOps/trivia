@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { withFirebase } from '../../../components/Firebase/firebase';
 import TextInput from '../../../components/TextInput';
-import styles from './styles.module.css';
+import styles from '../GradingPage/styles.module.css';
 
 const FIRST_ELEMENT_ID = 'id0';
 
@@ -14,13 +14,12 @@ class GradingPage extends React.Component {
     super(props);
 
     this.state = {
-      questions: [],
+      question: {},
       teams: {},
       teamNames: [],
       currentTeamNum: -1,
       teamCorrects: [],
-      round: '',
-      showQuestion: -1,
+      showQuestion: false,
     };
 
     this.firebase = props.firebase;
@@ -34,25 +33,50 @@ class GradingPage extends React.Component {
   }
 
   componentDidMount() {
+    // so for ease of use, we are just using the grading page code as much as possible
+
     // give time for clients' answers to get submitted
     this.timeout = setTimeout(() => {
-      // get the round, questions, and teams to grade
+      // get the teams that are tied and their answers
       this.firebase.getGame((res) => {
         if (!res.success) return;
         const game = res.data;
-        // get the round from stage, ex. round1-grading => round1
-        const round = game.stage.split('-')[0];
+
+        const allTeams = game.teams;
+        let tiedTeams = {};
+        let maxScore = 0;
+        // get the teams that are in the tie
+        // that is, they all have the same score, which is greater than all other teams' scores
+        Object.entries(allTeams).forEach(([teamName, teamData]) => {
+          // if this team has a higher score, clear teams and start new object with this team
+          if (teamData.score > maxScore) {
+            tiedTeams = {};
+            tiedTeams[teamName] = teamData;
+            maxScore = teamData.score;
+          // if team has the same as the max score, add them to the tied teams object
+          } else if (teamData.score === maxScore) {
+            tiedTeams[teamName] = teamData;
+          }
+        });
+
+        // make sure we actually have a tie
+        if (Object.keys(tiedTeams).length <= 1) {
+          // if no tie, we can just show standings
+          this.firebase.setStandings(allTeams, 'round3', () => {
+            this.props.history.push('/host/standings');
+          });
+        }
+
         this.setState({
-          // filter out missing bonus question and always tiebreaker
-          questions: game[round].filter((question, index) => (question.questionText !== '' && index !== 11)),
-          teams: game.teams,
-          teamNames: Object.keys(game.teams),
+          // filter out no bonus
+          // the tiebreaker is from the second round, 12 question (12 - 1 = 11th index)
+          question: game.round2[11],
+          teams: tiedTeams,
+          teamNames: Object.keys(tiedTeams),
           currentTeamNum: 0,
-          // 11 false in case of bonus, only will display ten if no, and last false will not matter
-          teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          round,
+          // just 1 correct for the tiebreaker
+          teamCorrects: [0],
         }, () => {
-          console.log(this.state.teams);
           // select the first input after each question
           const input = document.getElementById('id0');
           setTimeout(() => {
@@ -62,17 +86,6 @@ class GradingPage extends React.Component {
       });
     }, 2000);
   }
-
-  // just saving this because it might be better than that derived state thing on question page
-  // componentDidUpdate(prevProps) {
-  //   if (prevProps.match.params.team === this.props.match.params.team) {
-  //     return;
-  //   }
-
-  //   this.setState({
-  //     corrects: [false, false, false, false, false, false, false, false, false, false]
-  //   });
-  // }
 
   componentWillUnmount() {
     // have to clear every timeout we use just in case it doesn't finish
@@ -110,7 +123,7 @@ class GradingPage extends React.Component {
     this.setState({
       teamCorrects: prevTeamScores,
       currentTeamNum: prevTeamNum,
-      teams: updatedTeams,
+      teams: updatedTeams
     });
   }
 
@@ -118,6 +131,7 @@ class GradingPage extends React.Component {
     e.preventDefault();
 
     const updatedTeams = this.updateTeamScore(this.state.teamNames[this.state.currentTeamNum]);
+
     const nextTeamNum = this.state.currentTeamNum + 1;
     // keep repeating if we have teams left
     if (nextTeamNum < this.state.teamNames.length) {
@@ -130,7 +144,7 @@ class GradingPage extends React.Component {
       // it is possible that we went back and now we are going forward again, so check if we have
       // already graded some questions
       const nextTeamName = this.state.teamNames[nextTeamNum];
-      const nextTeamCorrects = updatedTeams[nextTeamName].questionScores || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const nextTeamCorrects = updatedTeams[nextTeamName].questionScores || [0];
 
       this.setState({
         teamCorrects: nextTeamCorrects,
@@ -144,39 +158,12 @@ class GradingPage extends React.Component {
         // add to the current score if possible
         let score = updatedTeams[name].score || 0;
         score += updatedTeams[name].questionScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
-        // remove question scores after we have graded them
-        delete updatedTeams[name].questionScores;
         updatedTeams[name].score = score;
-      }
-
-      // check for a tiebreaker after round 3
-      if (this.state.round === 'round3') {
-        // see if teams are tied
-        let isTie = false;
-        let maxScore = 0;
-        // go through each team, if new max score there is no tie
-        // if someone ties the max score, there is a tie (until max score is beaten again)
-        Object.values(updatedTeams).forEach((teamData) => {
-          if (teamData.score > maxScore) {
-            isTie = false;
-            maxScore = teamData.score;
-          } else if (teamData.score === maxScore) {
-            isTie = true;
-          }
-        });
-        // if there is a tie, keep the same round, update the teams, and go to tiebreaker page
-        if (isTie) {
-          this.firebase.setStandings(updatedTeams, 'round3-grading', () => {
-            this.props.history.push('/host/tiebreaker');
-          });
-          // return stops us from going to standings below
-          return;
-        }
       }
 
       // after setting standings, then go to the leaderboard/standings page
       // callback makes sure standings are set before we try to show them
-      this.firebase.setStandings(updatedTeams, this.state.round, () => {
+      this.firebase.setStandings(updatedTeams, 'round3', () => {
         this.props.history.push('/host/standings');
       });
     }
@@ -185,10 +172,10 @@ class GradingPage extends React.Component {
   render() {
     // TODO: mobile styling support
 
-    return this.state.questions.length > 0 ? (
+    return this.state.teamNames.length > 0 ? (
       <div className={styles.container}>
         <div className={styles.header}>
-          {`team: ${this.state.teamNames[this.state.currentTeamNum]}`}
+          {`tie: ${this.state.teamNames[this.state.currentTeamNum]}`}
         </div>
 
         <div className={styles.headerContainer}>
@@ -204,48 +191,44 @@ class GradingPage extends React.Component {
           <div className={styles.gradingContainer}>
             <div className={styles.divider} />
 
-            {this.state.questions.map((q, i) => (
-              <div key={i}>
-                <div className={styles.gradeContainer}>
-                  <div className={styles.showButton} role="button" tabIndex={1} onClick={() => this.setState({ showQuestion: i })}>
-                    <i className={classNames(styles.questionIcon, 'fas fa-question')} />
-                    <div className={styles.viewText}>
-                      View
-                    </div>
-                  </div>
-
-                  <div className={styles.answer}>
-                    {q.answer}
-                  </div>
-                  <div className={styles.answer} style={{ marginLeft: '5vw' }}>
-                    {this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round]
-                      && this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i]
-                        ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]][this.state.round][i] : 'no answer'}
-                  </div>
-
-                  <div className={styles.pointsContainer}>
-                    <TextInput
-                      value={this.state.teamCorrects[i]}
-                      onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.points))}
-                      type="number"
-                      width="6vw"
-                      id={`id${i}`}
-                      customStyle={{
-                        fontSize: '3vw',
-                        lineHeight: '3vw',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                      }}
-                    />
-                    <div className={styles.pointsText}>
-                      {`/ ${q.points}`}
-                    </div>
-                  </div>
+            <div className={styles.gradeContainer}>
+              <div className={styles.showButton} role="button" tabIndex={1} onClick={() => this.setState({ showQuestion: true })}>
+                <i className={classNames(styles.questionIcon, 'fas fa-question')} />
+                <div className={styles.viewText}>
+                  View
                 </div>
-
-                <div className={styles.divider} />
               </div>
-            ))}
+
+              <div className={styles.answer}>
+                {this.state.question.answer}
+              </div>
+              <div className={styles.answer} style={{ marginLeft: '5vw' }}>
+                {this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2
+                  && this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[11]
+                    ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[11] : 'no answer'}
+              </div>
+
+              <div className={styles.pointsContainer}>
+                <TextInput
+                  value={this.state.teamCorrects[0]}
+                  onChange={(e) => this.changeGrade(0, Math.min(e.target.value, this.state.question.points))}
+                  type="number"
+                  width="6vw"
+                  id={`id${0}`}
+                  customStyle={{
+                    fontSize: '3vw',
+                    lineHeight: '3vw',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                />
+                <div className={styles.pointsText}>
+                  {`/ ${this.state.question.points}`}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.divider} />
           </div>
 
           {this.state.currentTeamNum > 0 ? (
@@ -274,16 +257,16 @@ class GradingPage extends React.Component {
           <input type="submit" style={{ opacity: 0, display: 'none' }} />
         </form>
 
-        {this.state.showQuestion !== -1 ? (
+        {this.state.showQuestion ? (
           <div className={styles.modal}>
             <div className={styles.popUp}>
-              {this.state.questions[this.state.showQuestion].image ? (
-                <img src={this.state.questions[this.state.showQuestion].image} alt="Question" className={styles.showImage} />
+              {this.state.question.image ? (
+                <img src={this.state.question.image} alt="Question" className={styles.showImage} />
               ) : null}
               <div className={styles.showText}>
-                {this.state.questions[this.state.showQuestion].questionText}
+                {this.state.question.questionText}
               </div>
-              <i className={classNames('fas fa-times', styles.closeIcon)} role="button" tabIndex={0} onClick={() => this.setState({ showQuestion: -1 })} />
+              <i className={classNames('fas fa-times', styles.closeIcon)} role="button" tabIndex={0} onClick={() => this.setState({ showQuestion: false })} />
             </div>
           </div>
         ) : null}

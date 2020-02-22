@@ -40,8 +40,6 @@ class HostPage extends React.Component {
   }
 
   render() {
-    // TODO: change join/play url
-
     return (
       <div className={styles.container}>
         <div className={styles.headerRow}>

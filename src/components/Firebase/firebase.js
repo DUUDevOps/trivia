@@ -35,7 +35,7 @@ class Firebase {
    * @param {string} email
    * @param {string} password
    * @param {function} callback
-   * 
+   *
    */
   signInWithEmail = (email, password, callback) => {
     this.auth.signInWithEmailAndPassword(email, password)
@@ -55,20 +55,22 @@ class Firebase {
     // create an empty round array
     // 11 questions in case of bonus
     const round = [];
+    const emptyQuestion = {
+      questionText: '',
+      answer: '',
+      image: '',
+      imageId: '',
+      points: 1,
+    };
     for (let i = 0; i < 11; i++) {
-      round.push({
-        questionText: '',
-        answer: '',
-        image: '',
-        imageId: '',
-        points: 1,
-      });
+      round.push(emptyQuestion);
     }
 
     const newQuiz = {
       name,
       round1: round,
-      round2: round,
+      // add the tiebreaker to round 2
+      round2: [...round, emptyQuestion],
       round3: round
     };
 

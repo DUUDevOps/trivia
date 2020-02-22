@@ -80,7 +80,7 @@ class HostQuestionPage extends React.Component {
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
           {`round ${this.state.roundNum}: `}
-          {this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
+          {this.state.qnum === 12 ? 'tiebreaker' : this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
         </div>
 
         <div className={styles.questionContainer}>

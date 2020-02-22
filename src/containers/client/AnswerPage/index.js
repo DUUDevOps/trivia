@@ -33,10 +33,14 @@ class AnswerPage extends React.Component {
       this.round = game.stage;
       // see if there is a bonus question for this round
       // if so add an extra answer field
-      if (game[game.stage][10].questionText) {
+      if (game[game.stage] && game[game.stage][10] && game[game.stage][10].questionText) {
         num += 1;
       }
-
+      // see if there is a tiebreaker question for this round
+      // if so add an extra answer field
+      if (game[game.stage] && game[game.stage][11] && game[game.stage][11].questionText) {
+        num += 1;
+      }
       // add an empty answer for each question
       let answers = [];
       for (let i = 0; i < num; i++) {
@@ -102,7 +106,9 @@ class AnswerPage extends React.Component {
 
         {this.state.answers.map((a, index) => (
           <div className={styles.answerContainer} key={index}>
-            {index === 10 ? (
+            {index === 11 ? (
+              <i className={classNames('fas fa-not-equal', styles.answerNum)} />
+            ) : index === 10 ? (
               <i className={classNames('fas fa-star', styles.answerNum)} />
             ) : (
               <div className={styles.answerNum}>
