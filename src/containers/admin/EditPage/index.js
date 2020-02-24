@@ -200,7 +200,9 @@ class EditPage extends React.Component {
 
         {this.state.quiz[this.state.round].map((data, index) => (
           <div className={styles.questionContainer} key={index}>
-            {index === 10 ? (
+            {index === 11 ? (
+              <i className={classNames('fas fa-not-equal', styles.questionNum)} />
+            ) : index === 10 ? (
               <i className={classNames('fas fa-star', styles.questionNum)} />
             ) : (
               <div className={styles.questionNum}>
@@ -215,7 +217,7 @@ class EditPage extends React.Component {
                 </div>
                 <TextInput
                   placeholder="question"
-                  value={this.state.quiz[this.state.round][index].q}
+                  value={this.state.quiz[this.state.round][index].questionText}
                   onChange={(e) => this.setValue(e, 'q', index)}
                   width="100%"
                 />
@@ -227,7 +229,7 @@ class EditPage extends React.Component {
                 </div>
                 <TextInput
                   placeholder="answer"
-                  value={this.state.quiz[this.state.round][index].a}
+                  value={this.state.quiz[this.state.round][index].answer}
                   onChange={(e) => this.setValue(e, 'a', index)}
                   width="100%"
                 />
@@ -237,7 +239,7 @@ class EditPage extends React.Component {
             <div className={styles.centeredRow}>
               <div className={styles.pointsContainer}>
                 <TextInput
-                  value={this.state.quiz[this.state.round][index].pts}
+                  value={this.state.quiz[this.state.round][index].points}
                   onChange={(e) => this.setValue(e, 'pts', index)}
                   type="number"
                   width="100%"

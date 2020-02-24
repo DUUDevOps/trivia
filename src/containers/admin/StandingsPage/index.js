@@ -17,12 +17,14 @@ class StandingsPage extends React.Component {
     this.state = {
       standings: [],
       stage: '',
+      numberToReveal: 0,
     };
 
     this.firebase = props.firebase;
     this.round = '';
 
     this.nextRound = this.nextRound.bind(this);
+    this.reveal = this.reveal.bind(this);
   }
 
   componentDidMount() {
@@ -52,11 +54,14 @@ class StandingsPage extends React.Component {
       // display the standings
       // this.state.stage will either be standings or final standings
       // this.round is used to start next round
-      const stage = game.stage.split('-');
+      // if game is over, we can pretend to reveal standings again
+      const stage = game.stage === 'finished' ? 'round3-final standings'.split('-') : game.stage.split('-');
       this.round = stage[0];
       this.setState({
         standings,
         stage: stage[1],
+        // revealing top 5 at max
+        numberToReveal: Math.min(5, standings.length),
       });
     });
   }
@@ -64,6 +69,14 @@ class StandingsPage extends React.Component {
   nextRound() {
     this.firebase.setStage(`round${parseInt(this.round.slice(-1)) + 1}`, () => {
       this.props.history.push('/host/question/1');
+    });
+  }
+
+  reveal() {
+    this.setState({ numberToReveal: this.state.numberToReveal - 1 }, () => {
+      if (this.state.numberToReveal <= 0) {
+        this.firebase.setStage('finished');
+      }
     });
   }
 
@@ -86,10 +99,27 @@ class StandingsPage extends React.Component {
             next round
             <i className={classNames('fas fa-arrow-right', styles.arrow)} />
           </div>
+        ) : this.state.numberToReveal > 0 ? (
+          <div
+            className={styles.nextButton}
+            role="button"
+            tabIndex={0}
+            onClick={this.reveal}
+          >
+            reveal next
+            <i className={classNames('fas fa-arrow-right', styles.arrow)} />
+          </div>
         ) : null}
 
         {this.state.standings.filter((s, i) => (i < 5)).map((s, i) => (
-          <div className={styles.standingsHolder} key={s.name} style={{ marginBottom: i !== this.state.standings.length - 1 ? 0 : 'auto' }}>
+          <div
+            className={styles.standingsHolder}
+            key={s.name}
+            style={{
+              marginBottom: i !== this.state.standings.length - 1 ? 0 : 'auto',
+              opacity: this.state.stage !== 'final standings' || this.state.numberToReveal <= i ? 1 : 0,
+            }}
+          >
             <ReactTooltip place="top" effect="solid" className={styles.tooltip} />
             <div className={styles.standingContainer} data-tip={getIdsText(s.ids)}>
               <div className={styles.placeText}>

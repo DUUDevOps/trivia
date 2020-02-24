@@ -34,7 +34,7 @@ class DashboardPage extends React.Component {
   componentDidMount() {
     // see if there is a live game we can reload
     this.firebase.getGame((response) => {
-      if (response.success && response.data.stage !== 'round3-final standings') {
+      if (response.success && response.data.stage !== 'finished') {
         this.setState({ isLiveGame: true });
       };
     });
@@ -74,7 +74,7 @@ class DashboardPage extends React.Component {
         // make sure there is a stage, should always be there, but just to be safe
         if (!stage) return;
         // make sure game still isn't over
-        if (stage === 'round3-final standings') {
+        if (stage === 'finished') {
           this.setState({ isLiveGame: false });
           return;
         }

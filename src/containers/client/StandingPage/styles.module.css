@@ -8,6 +8,12 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 500ms;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1 }
 }
 
 .placeText {

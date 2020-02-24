@@ -33,12 +33,16 @@ class AnswerPage extends React.Component {
       this.round = game.stage;
       // see if there is a bonus question for this round
       // if so add an extra answer field
-      if (game[game.stage][10].questionText) {
+      if (game[game.stage] && game[game.stage][10] && game[game.stage][10].questionText) {
         num += 1;
       }
-
+      // see if there is a tiebreaker question for this round
+      // if so add an extra answer field
+      if (game[game.stage] && game[game.stage][11] && game[game.stage][11].questionText) {
+        num += 1;
+      }
       // add an empty answer for each question
-      const answers = [];
+      let answers = [];
       for (let i = 0; i < num; i++) {
         answers.push('');
       }
@@ -53,6 +57,17 @@ class AnswerPage extends React.Component {
         stage = 'round 3';
       }
 
+      // get the stored string, and make sure it exists
+      const storedString = localStorage.getItem('trivia-answers');
+      if (storedString) {
+        // make the array from the string
+        const savedAnswers = JSON.parse(storedString);
+        // make sure it has the right number of answers
+        if (savedAnswers && savedAnswers.length === answers.length) {
+          answers = savedAnswers;
+        }
+      }
+
       this.setState({ answers, stage });
     });
 
@@ -60,7 +75,10 @@ class AnswerPage extends React.Component {
     this.dbRef.on('value', (snapshot) => {
       const stage = snapshot.val().stage;
       if (['round1-grading', 'round2-grading', 'round3-grading'].includes(stage)) {
+        // submit answers to db
         this.firebase.setTeamAnswers(JSON.parse(localStorage.getItem('game')).name, this.round, this.state.answers);
+        // remove answers because we just submitted
+        localStorage.removeItem('trivia-answers');
         this.props.history.push('/play/waiting');
       }
     });
@@ -73,7 +91,10 @@ class AnswerPage extends React.Component {
   changeAnswer(e, index) {
     const answers = [...this.state.answers];
     answers[index] = e.target.value;
-    this.setState({ answers });
+    this.setState({ answers }, () => {
+      // store our answers, have to stringify because localstorage can't store an array
+      localStorage.setItem('trivia-answers', JSON.stringify(answers));
+    });
   }
 
   render() {
@@ -85,7 +106,9 @@ class AnswerPage extends React.Component {
 
         {this.state.answers.map((a, index) => (
           <div className={styles.answerContainer} key={index}>
-            {index === 10 ? (
+            {index === 11 ? (
+              <i className={classNames('fas fa-not-equal', styles.answerNum)} />
+            ) : index === 10 ? (
               <i className={classNames('fas fa-star', styles.answerNum)} />
             ) : (
               <div className={styles.answerNum}>

@@ -36,7 +36,7 @@ class PlayPage extends React.Component {
         this.setState({ dbExists: false });
       } else {
         this.setState({
-          joinable: game.data.stage !== 'round3-final standings',
+          joinable: game.data.stage !== 'finished',
           dbExists: true,
         });
       }
@@ -46,7 +46,7 @@ class PlayPage extends React.Component {
     this.dbRef.on('value', (snapshot) => {
       if (snapshot.exists()) {
         this.setState({
-          joinable: snapshot.val().stage !== 'round3-final standings',
+          joinable: snapshot.val().stage !== 'finished',
         });
       }
     });
@@ -103,6 +103,7 @@ class PlayPage extends React.Component {
         if (this.state.currentTeam) {
           this.firebase.removeTeam(this.state.currentTeam);
           localStorage.removeItem('game');
+          localStorage.removeItem('trivia-answers');
         }
         // join game
         this.firebase.joinGame(this.state.team, ids, (data) => {
@@ -120,6 +121,7 @@ class PlayPage extends React.Component {
     // clear token and state if we can't actually rejoin
     const noRejoin = () => {
       localStorage.removeItem('game');
+      localStorage.removeItem('trivia-answers');
       this.setState({ currentTeam: '' });
     };
 
