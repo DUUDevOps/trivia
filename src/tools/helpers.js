@@ -49,3 +49,12 @@ export const getIdsText = (ids) => {
   }
   return string;
 };
+
+// convert vw and vh dimensions to px
+export const viewportToPixels = (value) => {
+  const parts = value.match(/([0-9.]+)(vh|vw)/);
+  const q = Number(parts[1]);
+  const side = window[['innerHeight', 'innerWidth'][['vh', 'vw'].indexOf(parts[2])]];
+  return side * (q / 100);
+};
+

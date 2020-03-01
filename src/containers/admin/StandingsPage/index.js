@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip';
 import styles from './styles.module.css';
 import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
 import { withFirebase } from '../../../components/Firebase/firebase';
-import { getIdsText } from '../../../tools/helpers';
+import { getIdsText, viewportToPixels } from '../../../tools/helpers';
 
 class StandingsPage extends React.Component {
   constructor(props) {
@@ -18,6 +18,8 @@ class StandingsPage extends React.Component {
       standings: [],
       stage: '',
       numberToReveal: 0,
+      teamsToDisplay: 0,
+      isMaxWidth: false,
     };
 
     this.firebase = props.firebase;
@@ -31,8 +33,15 @@ class StandingsPage extends React.Component {
     this.firebase.getGame((res) => {
       if (!res.success || !res.data) return;
       const game = res.data;
+      // remove teams without scores
+      const teams = {};
+      Object.entries(game.teams).forEach(([teamName, teamData]) => {
+        if (teamData.score || teamData.score === 0) {
+          teams[teamName] = teamData;
+        }
+      });
       // create a standings array
-      const standings = Object.entries(game.teams).map(([name, data]) => ({
+      const standings = Object.entries(teams).map(([name, data]) => ({
         name,
         score: data.score,
         ids: data.ids,
@@ -51,6 +60,13 @@ class StandingsPage extends React.Component {
         standings[i].place = place;
       }
 
+      // the size of the standings holder
+      const holderHeight = viewportToPixels('95vh') - 125;
+      // 83 px is size of standing, * 2 for 2 columns
+      const maxTeams = Math.floor(holderHeight / 83) * 2;
+      // either show as many as we can fix or all the standings
+      const teamsToDisplay = Math.min(maxTeams, standings.length);
+
       // display the standings
       // this.state.stage will either be standings or final standings
       // this.round is used to start next round
@@ -60,8 +76,10 @@ class StandingsPage extends React.Component {
       this.setState({
         standings,
         stage: stage[1],
-        // revealing top 5 at max
-        numberToReveal: Math.min(5, standings.length),
+        numberToReveal: teamsToDisplay,
+        teamsToDisplay,
+        // make the teams max width if we have room
+        isMaxWidth: maxTeams / 2 >= teamsToDisplay,
       });
     });
   }
@@ -92,7 +110,7 @@ class StandingsPage extends React.Component {
           <img src={DukeNiteLogo} alt="Duke@Nite" className={styles.headerLogo} />
         </div>
 
-        <div className={styles.divider} style={{ width: '60vw' }} />
+        <div className={styles.divider} style={{ width: '90vw' }} />
 
         {this.state.stage !== 'final standings' ? (
           <div className={styles.nextButton} role="button" tabIndex={0} onClick={this.nextRound}>
@@ -111,35 +129,36 @@ class StandingsPage extends React.Component {
           </div>
         ) : null}
 
-        {this.state.standings.filter((s, i) => (i < 5)).map((s, i) => (
-          <div
-            className={styles.standingsHolder}
-            key={s.name}
-            style={{
-              marginBottom: i !== this.state.standings.length - 1 ? 0 : 'auto',
-              opacity: this.state.stage !== 'final standings' || this.state.numberToReveal <= i ? 1 : 0,
-            }}
-          >
-            <ReactTooltip place="top" effect="solid" className={styles.tooltip} />
-            <div className={styles.standingContainer} data-tip={getIdsText(s.ids)}>
-              <div className={styles.placeText}>
-                {s.place}
+        <div className={styles.standingsFlow}>
+          {this.state.standings.filter((s, i) => (i < this.state.teamsToDisplay)).map((s, i) => (
+            <div
+              className={styles.standingsHolder}
+              key={s.name}
+              style={{
+                marginBottom: i !== this.state.standings.length - 1 ? 0 : 'auto',
+                opacity: this.state.stage !== 'final standings' || this.state.numberToReveal <= i ? 1 : 0,
+                width: this.state.isMaxWidth ? '90vw' : '43vw',
+              }}
+            >
+              <ReactTooltip place="top" effect="solid" className={styles.tooltip} />
+              <div className={styles.standingContainer} data-tip={getIdsText(s.ids)}>
+                <div className={styles.placeText}>
+                  {s.place}
+                </div>
+
+                <Textfit className={styles.nameText} mode="single" forceSingleModeWidth={false} max={32}>
+                  {s.name}
+                </Textfit>
+
+                <div className={styles.scoreText}>
+                  {s.score}
+                </div>
               </div>
 
-              <Textfit className={styles.nameText} mode="single" forceSingleModeWidth={false} max={32}>
-                {s.name}
-              </Textfit>
-
-              <div className={styles.scoreText}>
-                {s.score}
-              </div>
-            </div>
-
-            {i !== this.state.standings.length - 1 ? (
               <div className={styles.divider} />
-            ) : null}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
     ) : null;
   }

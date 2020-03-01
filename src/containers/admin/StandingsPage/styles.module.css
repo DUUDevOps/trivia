@@ -17,7 +17,7 @@
 }
 
 .headerRow {
-  width: 60vw;
+  width: 90vw;
   min-width: 300px;
   margin: auto auto 10px auto;
   display: flex;
@@ -58,8 +58,19 @@
   font-size: 1.6vw;
 }
 
+.standingsFlow {
+  display: flex;
+  flex-flow: column wrap;
+  align-content: space-between;
+  height: calc(92.5vh - 125px);
+  width: 90vw;
+  overflow: hidden;
+  margin-bottom: auto;
+}
+
 .standingsHolder {
-  width: 60vw;
+  height: 83px;
+  width: 43vw;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -89,7 +100,7 @@
 }
 
 .nameText {
-  width: calc(60vw - 125px);
+  width: calc(100% - 125px);
   height: 50px;
   line-height: 50px;
 }

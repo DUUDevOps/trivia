@@ -47,7 +47,7 @@ class GradingPage extends React.Component {
         const teams = {};
         Object.entries(game.teams).forEach(([teamName, teamData]) => {
           // filter answers to only include non-empty answers, and make sure there is at least 1
-          if (teamData[round].filter((answer) => (answer !== '')).length > 0) {
+          if (teamData[round] && teamData[round].filter((answer) => (answer !== '')).length > 0) {
             teams[teamName] = teamData;
           } else {
             // save the teams that do not answer so we don't delete them from the game
@@ -55,6 +55,17 @@ class GradingPage extends React.Component {
             this.noAnswerTeams[teamName] = teamData;
           }
         });
+
+        // make sure we have something to grade
+        if (Object.keys(teams).length === 0) {
+          // if not, just go to standings
+          // don't use set standings because we don't want to update standings
+          this.firebase.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, () => {
+            this.props.history.push('/host/standings');
+          });
+          return;
+        }
+
         // set the state with the new data
         this.setState({
           // filter out missing bonus question and always tiebreaker
@@ -66,7 +77,6 @@ class GradingPage extends React.Component {
           teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
           round,
         }, () => {
-          console.log(this.state.teams);
           // select the first input after each question
           const input = document.getElementById('id0');
           setTimeout(() => {
@@ -165,7 +175,10 @@ class GradingPage extends React.Component {
 
       // restore the teams that didn't answer this round
       Object.entries(this.noAnswerTeams).forEach(([teamName, teamData]) => {
-        updatedTeams[teamName] = teamData;
+        updatedTeams[teamName] = {
+          ...teamData,
+          score: teamData.score || 0,
+        };
       });
 
       // check for a tiebreaker after round 3
