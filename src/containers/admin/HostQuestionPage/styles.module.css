@@ -72,3 +72,14 @@
   margin: auto 1.5vw;
   font-size: 2.2vw;
 }
+
+.joinText {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  font-size: 1.75vw;
+  opacity: 0.8;
+  color: #fff;
+  text-decoration: none;
+  transform: translateX(-50%);
+}

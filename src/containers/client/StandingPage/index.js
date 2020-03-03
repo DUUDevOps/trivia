@@ -27,8 +27,15 @@ class StandingPage extends React.Component {
     this.firebase.getGame((res) => {
       if (!res.success) return;
       const game = res.data;
+      // remove teams without scores
+      const teams = {};
+      Object.entries(game.teams).forEach(([teamName, teamData]) => {
+        if (teamData.score || teamData.score === 0) {
+          teams[teamName] = teamData;
+        }
+      });
       // create a standings array
-      const standings = Object.entries(game.teams).map(([name, data]) => ({
+      const standings = Object.entries(teams).map(([name, data]) => ({
         name,
         score: data.score,
         place: 1,

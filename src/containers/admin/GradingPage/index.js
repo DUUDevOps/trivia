@@ -8,6 +8,7 @@ import TextInput from '../../../components/TextInput';
 import styles from './styles.module.css';
 
 const FIRST_ELEMENT_ID = 'id0';
+const TIEBREAKER_INDEX = 11;
 
 class GradingPage extends React.Component {
   constructor(props) {
@@ -26,6 +27,7 @@ class GradingPage extends React.Component {
     this.firebase = props.firebase;
 
     this.currentRoundTeamScores = [];
+    this.noAnswerTeams = {};
 
     this.changeGrade = this.changeGrade.bind(this);
     this.prevTeam = this.prevTeam.bind(this);
@@ -42,17 +44,40 @@ class GradingPage extends React.Component {
         const game = res.data;
         // get the round from stage, ex. round1-grading => round1
         const round = game.stage.split('-')[0];
+        // only use teams that have at least one answer
+        const teams = {};
+        Object.entries(game.teams).forEach(([teamName, teamData]) => {
+          // filter answers to only include non-empty answers, and make sure there is at least 1
+          if (teamData[round] && teamData[round].filter((answer) => (answer !== '')).length > 0) {
+            teams[teamName] = teamData;
+          } else {
+            // save the teams that do not answer so we don't delete them from the game
+            // they'll be added back when we are grading
+            this.noAnswerTeams[teamName] = teamData;
+          }
+        });
+
+        // make sure we have something to grade
+        if (Object.keys(teams).length === 0) {
+          // if not, just go to standings
+          // don't use set standings because we don't want to update standings
+          this.firebase.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, () => {
+            this.props.history.push('/host/standings');
+          });
+          return;
+        }
+
+        // set the state with the new data
         this.setState({
           // filter out missing bonus question and always tiebreaker
-          questions: game[round].filter((question, index) => (question.questionText !== '' && index !== 11)),
-          teams: game.teams,
-          teamNames: Object.keys(game.teams),
+          questions: game[round].filter((question, index) => (question.questionText !== '' && index !== TIEBREAKER_INDEX)),
+          teams: teams,
+          teamNames: Object.keys(teams),
           currentTeamNum: 0,
           // 11 false in case of bonus, only will display ten if no, and last false will not matter
           teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
           round,
         }, () => {
-          console.log(this.state.teams);
           // select the first input after each question
           const input = document.getElementById('id0');
           setTimeout(() => {
@@ -149,6 +174,14 @@ class GradingPage extends React.Component {
         updatedTeams[name].score = score;
       }
 
+      // restore the teams that didn't answer this round
+      Object.entries(this.noAnswerTeams).forEach(([teamName, teamData]) => {
+        updatedTeams[teamName] = {
+          ...teamData,
+          score: teamData.score || 0,
+        };
+      });
+
       // check for a tiebreaker after round 3
       if (this.state.round === 'round3') {
         // see if teams are tied
@@ -189,6 +222,10 @@ class GradingPage extends React.Component {
       <div className={styles.container}>
         <div className={styles.header}>
           {`team: ${this.state.teamNames[this.state.currentTeamNum]}`}
+        </div>
+
+        <div className={styles.teamNum}>
+          {`${this.state.currentTeamNum + 1} / ${this.state.teamNames.length}`}
         </div>
 
         <div className={styles.headerContainer}>

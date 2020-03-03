@@ -122,6 +122,10 @@ class HostQuestionPage extends React.Component {
             back
           </Link>
         ) : null}
+
+        <div className={styles.joinText}>
+          join at&nbsp;<u>duudevops.github.io/trivia</u>
+        </div>
       </div>
     ) : null;
   }

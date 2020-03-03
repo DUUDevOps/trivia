@@ -8,7 +8,16 @@
 .header {
   font-weight: bold;
   font-size: 52px;
+  width: calc(100% - 6vw - 120px);
   margin: 3vh 3vw 2vh 3vw;
+}
+
+.teamNum {
+  font-weight: bold;
+  font-size: 48px;
+  position: absolute;
+  top: 10px;
+  right: 30px;
 }
 
 .nextButton {
