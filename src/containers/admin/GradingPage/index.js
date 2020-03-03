@@ -8,6 +8,7 @@ import TextInput from '../../../components/TextInput';
 import styles from './styles.module.css';
 
 const FIRST_ELEMENT_ID = 'id0';
+const TIEBREAKER_INDEX = 11;
 
 class GradingPage extends React.Component {
   constructor(props) {
@@ -69,7 +70,7 @@ class GradingPage extends React.Component {
         // set the state with the new data
         this.setState({
           // filter out missing bonus question and always tiebreaker
-          questions: game[round].filter((question, index) => (question.questionText !== '' && index !== 11)),
+          questions: game[round].filter((question, index) => (question.questionText !== '' && index !== TIEBREAKER_INDEX)),
           teams: teams,
           teamNames: Object.keys(teams),
           currentTeamNum: 0,
