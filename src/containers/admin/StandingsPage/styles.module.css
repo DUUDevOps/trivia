@@ -123,3 +123,10 @@
   font-size: 15px;
   padding: 6px 13px;
 }
+
+.imgButton {
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+}
