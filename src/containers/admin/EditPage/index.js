@@ -265,7 +265,7 @@ class EditPage extends React.Component {
                   <div
                     className={styles.imageButton}
                     role="button"
-                    tabIndex={0}
+                    tabIndex={-1}
                     onClick={() => this.setState({ showImageModal: true, imageIndex: index, imageUrl: '' })}
                   >
                     <i className={classNames(styles.imageIcon, 'far fa-image')} />

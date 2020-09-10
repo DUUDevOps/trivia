@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { Textfit } from 'react-textfit';
 import classNames from 'classnames';
 import ReactTooltip from 'react-tooltip';
@@ -107,7 +107,13 @@ class StandingsPage extends React.Component {
           <div className={styles.headerText}>
             {this.state.stage}
           </div>
-          <img src={DukeNiteLogo} alt="Duke@Nite" className={styles.headerLogo} />
+          {this.state.stage === 'final standings' ? (
+            <Link to="/admin/dashboard" className={styles.imgButton}>
+              <img src={DukeNiteLogo} alt="Duke@Nite" className={styles.headerLogo} draggable={false} />
+            </Link>
+          ) : (
+            <img src={DukeNiteLogo} alt="Duke@Nite" className={styles.headerLogo} />
+          )}
         </div>
 
         <div className={styles.divider} style={{ width: '90vw' }} />

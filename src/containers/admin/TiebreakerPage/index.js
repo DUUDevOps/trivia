@@ -23,7 +23,7 @@ class GradingPage extends React.Component {
     };
 
     this.firebase = props.firebase;
-
+    this.otherTeams = {};
     this.currentRoundTeamScores = [];
 
     this.changeGrade = this.changeGrade.bind(this);
@@ -64,6 +64,14 @@ class GradingPage extends React.Component {
           // if no tie, we can just show standings
           this.firebase.setStandings(allTeams, 'round3', () => {
             this.props.history.push('/host/standings');
+          });
+        } else {
+          // if we do have a tie, remember all the other teams
+          const tiedTeamNames = Object.keys(tiedTeams);
+          Object.entries(allTeams).forEach(([teamName, teamData]) => {
+            if (!tiedTeamNames.includes(teamName)) {
+              this.otherTeams[teamName] = teamData;
+            }
           });
         }
 
@@ -130,7 +138,7 @@ class GradingPage extends React.Component {
   nextTeam(e) {
     e.preventDefault();
 
-    const updatedTeams = this.updateTeamScore(this.state.teamNames[this.state.currentTeamNum]);
+    let updatedTeams = this.updateTeamScore(this.state.teamNames[this.state.currentTeamNum]);
 
     const nextTeamNum = this.state.currentTeamNum + 1;
     // keep repeating if we have teams left
@@ -160,6 +168,9 @@ class GradingPage extends React.Component {
         score += updatedTeams[name].questionScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
         updatedTeams[name].score = score;
       }
+
+      // don't forget the other teams
+      updatedTeams = { ...this.otherTeams, ...updatedTeams };
 
       // after setting standings, then go to the leaderboard/standings page
       // callback makes sure standings are set before we try to show them
