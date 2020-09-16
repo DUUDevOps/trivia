@@ -55,7 +55,7 @@ class HostPage extends React.Component {
         </div>
 
         <div className={styles.instructText}>
-          join at&nbsp;<u>duudevops.github.io/trivia</u>
+          join at&nbsp;<u>duu-trivia.herokuapp.com</u>
         </div>
 
         <div className={styles.teamsContainer}>
