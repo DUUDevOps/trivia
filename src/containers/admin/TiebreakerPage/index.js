@@ -181,7 +181,7 @@ class GradingPage extends React.Component {
   }
 
   render() {
-    // TODO: mobile styling support
+    // not supported on mobile
 
     return this.state.teamNames.length > 0 ? (
       <div className={styles.container}>

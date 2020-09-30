@@ -25,9 +25,7 @@ class GradingPage extends React.Component {
     };
 
     this.firebase = props.firebase;
-
-    this.currentRoundTeamScores = [];
-    this.noAnswerTeams = {};
+    this.dbRef = this.firebase.getLiveGameRef();
 
     this.changeGrade = this.changeGrade.bind(this);
     this.prevTeam = this.prevTeam.bind(this);
@@ -36,6 +34,17 @@ class GradingPage extends React.Component {
   }
 
   componentDidMount() {
+    this.dbRef.on('value', (snapshot) => {
+      // listen until it's time to grade
+      const stage = snapshot.val().stage;
+      if (stage.includes('grading')) {
+        // give some time for players to submit questions
+        this.timeout = setTimeout(() => {
+          this.setState({ canGrade: true });
+        }, 2000);
+      }
+    });
+
     // give time for clients' answers to get submitted
     this.timeout = setTimeout(() => {
       // get the round, questions, and teams to grade
@@ -102,6 +111,7 @@ class GradingPage extends React.Component {
   componentWillUnmount() {
     // have to clear every timeout we use just in case it doesn't finish
     clearTimeout(this.timeout);
+    this.dbRef.off('value');
   }
 
   // points values in val
@@ -216,8 +226,7 @@ class GradingPage extends React.Component {
   }
 
   render() {
-    // TODO: mobile styling support
-
+    // not supported on mobile
     return this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <div className={styles.header}>

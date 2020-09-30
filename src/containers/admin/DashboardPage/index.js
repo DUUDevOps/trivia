@@ -92,7 +92,7 @@ class DashboardPage extends React.Component {
         }
         // otherwise, we are either grading or in the standing phase
         if (stageInfo[1] === 'grading') {
-          this.props.history.push('/host/grading');
+          this.props.history.push('/host/waiting');
         } else {
           this.props.history.push('/host/standings');
         }

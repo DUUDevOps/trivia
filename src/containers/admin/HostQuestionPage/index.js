@@ -65,8 +65,10 @@ class HostQuestionPage extends React.Component {
   }
 
   endRound() {
-    this.firebase.setStage(`${this.stage}-grading`, () => {
-      this.props.history.push('/host/grading');
+    this.firebase.clearGrading(() => {
+      this.firebase.setStage(`${this.stage}-grading`, () => {
+        this.props.history.push('/host/waiting');
+      });
     });
   }
 

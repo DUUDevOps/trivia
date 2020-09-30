@@ -270,11 +270,40 @@ class Firebase {
    * @param {function} callback
    */
   setStandings = (teams, round, callback) => {
-    // inefficient christmas tree, but not sure if await works with firebase
+    // inefficient christmas tree
     this.liveGameRef.child('teams').set(teams)
       .then(() => {
         this.setStage(`${round}-${round === 'round3' ? 'final standings' : 'standings'}`, callback);
       });
+  };
+
+  /**
+   * clear the grading objects
+   * @param {function} callback
+   */
+  clearGrading = (callback) => {
+    // inefficient, idc
+    this.liveGameRef.child('graded').remove().then(() => {
+      this.liveGameRef.child('grading').remove().then(callback);
+    })
+  };
+
+  /**
+   * add a value to grading object
+   * @param {string} teamName
+   */
+  addGrading = (teamName) => {
+    this.liveGameRef.child('grading').push().set(teamName);
+  };
+
+  /**
+   * remove a value from grading object and add it to graded
+   * @param {string} teamName
+   */
+  moveToGraded = (teamName) => {
+    this.liveGameRef.child('grading').remove(teamName).then(() => {
+      this.liveGameRef.child('graded').push().set(teamName);
+    });
   };
 
   /**
