@@ -29,21 +29,11 @@ class AnswerPage extends React.Component {
     this.firebase.getGame((res) => {
       if (!res.success) return;
       const game = res.data;
-      let num = 10;
+      const numQuestions = game[game.stage].filter((q) => (q.questionText)).length;
       this.round = game.stage;
-      // see if there is a bonus question for this round
-      // if so add an extra answer field
-      if (game[game.stage] && game[game.stage][10] && game[game.stage][10].questionText) {
-        num += 1;
-      }
-      // see if there is a tiebreaker question for this round
-      // if so add an extra answer field
-      if (game[game.stage] && game[game.stage][11] && game[game.stage][11].questionText) {
-        num += 1;
-      }
       // add an empty answer for each question
       let answers = [];
-      for (let i = 0; i < num; i++) {
+      for (let i = 0; i < numQuestions; i++) {
         answers.push('');
       }
 
