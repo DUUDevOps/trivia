@@ -108,14 +108,24 @@ class GradingPage extends React.Component {
       // tell firebase that we're grading this team
       this.firebase.addGrading(teamName);
 
+      // set the teamScores to the points values if they are definitely correct
+      // 11 false in case of bonus, only will display ten if no, and last false will not matter
+      const teamScores = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      // filter out missing bonus question and always tiebreaker
+      const questions = game[round].filter((question, index) => (question.questionText !== '' && index !== TIEBREAKER_INDEX));
+      // mark questions that are an exact match as correct
+      questions.forEach((q, i) => {
+        if (game.teams[teamName][round][i].toLowerCase().trim() === q.answer.toLowerCase().trim()) {
+          teamScores[i] = q.points;
+        }
+      });
+
       // set the state with the new data
       this.setState({
-        // filter out missing bonus question and always tiebreaker
-        questions: game[round].filter((question, index) => (question.questionText !== '' && index !== TIEBREAKER_INDEX)),
+        questions,
         team: game.teams[teamName],
         teamName,
-        // 11 false in case of bonus, only will display ten if no, and last false will not matter
-        teamScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        teamScores,
         round,
       }, () => {
         // select the first input after each question
