@@ -19,12 +19,14 @@ class GradingPage extends React.Component {
       questions: [],
       team: {},
       teamName: '',
-      teamCorrects: [],
+      teamScores: [],
       round: '',
+      showQuestion: -1,
     };
 
     this.firebase = props.firebase;
     this.dbRef = this.firebase.getLiveGameRef();
+    this.loading = false;
 
     this.getResponses = this.getResponses.bind(this);
     this.changeGrade = this.changeGrade.bind(this);
@@ -32,16 +34,20 @@ class GradingPage extends React.Component {
   }
 
   componentDidMount() {
+    let stage = '';
     this.dbRef.on('value', (snapshot) => {
       // listen until it's time to grade
-      const stage = snapshot.val().stage;
+      // only do something when the stage changes
+      if (stage === snapshot.val().stage) return;
+      stage = snapshot.val().stage;
       if (stage.includes('grading')) {
         // give some time for players to submit questions
         this.timeout = setTimeout(() => {
           this.setState({ canGrade: true });
         }, 2000);
       } else {
-        this.setState({ canGrade: false });
+        clearTimeout(this.timeout);
+        this.setState({ canGrade: false, teamName: '', questions: [], team: {} });
       }
     });
   }
@@ -64,14 +70,17 @@ class GradingPage extends React.Component {
   }
 
   getResponses() {
+    if (this.loading) return;
+    this.loading = true;
     // get the round, questions, and teams to grade
     this.firebase.getGame((res) => {
+      this.loading = false;
       if (!res.success) return;
       const game = res.data;
       // get the round from stage, ex. round1-grading => round1
       const round = game.stage.split('-')[0];
-      const graded = game.graded || [];
-      const grading = game.grading || [];
+      const graded = game.graded ? Object.keys(game.graded) : [];
+      const grading = game.grading ? Object.keys(game.grading) : [];
       const teamNames = [];
       let teamName = '';
       Object.entries(game.teams).forEach(([teamName, teamData]) => {
@@ -106,7 +115,7 @@ class GradingPage extends React.Component {
         team: game.teams[teamName],
         teamName,
         // 11 false in case of bonus, only will display ten if no, and last false will not matter
-        teamCorrects: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        teamScores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         round,
       }, () => {
         // select the first input after each question
@@ -120,16 +129,16 @@ class GradingPage extends React.Component {
 
   // points values in val
   changeGrade(i, val) {
-    const teamCorrects = [...this.state.teamCorrects];
-    teamCorrects[i] = val;
-    this.setState({ teamCorrects });
+    const teamScores = [...this.state.teamScores];
+    teamScores[i] = val;
+    this.setState({ teamScores });
   }
 
   submitTeam(e) {
     e.preventDefault();
     // add the new score to the previous score if it exists
     let score = this.state.team.score || 0;
-    score += this.state.questionScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
+    score += this.state.teamScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
     // save the score in firebase
     this.firebase.setGraded(this.state.teamName, score, () => {
       this.setState({
@@ -154,11 +163,7 @@ class GradingPage extends React.Component {
     ) : this.state.questions.length > 0 ? (
       <div className={styles.container}>
         <div className={styles.header}>
-          {`team: ${this.state.teamNames[this.state.currentTeamNum]}`}
-        </div>
-
-        <div className={styles.teamNum}>
-          {`${this.state.currentTeamNum + 1} / ${this.state.teamNames.length}`}
+          {`team: ${this.state.teamName}`}
         </div>
 
         <div className={styles.headerContainer}>
@@ -194,7 +199,7 @@ class GradingPage extends React.Component {
 
                   <div className={styles.pointsContainer}>
                     <TextInput
-                      value={this.state.teamCorrects[i]}
+                      value={this.state.teamScores[i]}
                       onChange={(e) => this.changeGrade(i, Math.min(e.target.value, q.points))}
                       type="number"
                       width="6vw"

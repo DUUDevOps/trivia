@@ -34,13 +34,6 @@
   transform: scale(0.97);
 }
 
-@media only screen and (max-width: 450px) {
-  .createContainer {
-    width: calc(310px - 46px);
-    margin: 25px auto;
-  }
-}
-
 .createIcon {
   font-size: 40px;
   background-color: #fff;
@@ -60,19 +53,29 @@
   margin: 0px 20px 10px 20px;
 }
 
+.liveGameContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4vh auto;
+  width: 80%;
+}
+
 .liveGameButton {
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
   padding: 5px 25px 15px 25px;
-  margin: 6vh auto;
   border-width: 5px;
   border-color: #fff;
   border-style: dashed;
   border-radius: 0px;
-  width: 40vw;
+  width: 40%;
   cursor: pointer;
   outline: none;
+  text-decoration: none;
   transition: 200ms;
 }
 .liveGameButton:hover,
@@ -147,4 +150,18 @@
 }
 .quizButton:hover {
   transform: scale(0.95);
+}
+
+@media only screen and (max-width: 450px) {
+  .createContainer {
+    width: calc(310px - 46px);
+    margin: 25px auto;
+  }
+  .liveGameContainer {
+    flex-direction: column;
+  }
+  .liveGameButton {
+    width: 100%;
+    margin: 1vh auto;
+  }
 }

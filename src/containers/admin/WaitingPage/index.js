@@ -9,8 +9,7 @@ class WaitingPage extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    };
+    this.state = {};
 
     this.firebase = props.firebase;
     this.dbRef = this.firebase.getLiveGameRef();
@@ -22,7 +21,7 @@ class WaitingPage extends React.Component {
       const game = snapshot.val();
       const round = game.stage.split('-')[0];
       const teams = {};
-      const graded = {};
+      const graded = game.graded || {};
       Object.entries(game.teams).forEach(([teamName, teamData]) => {
         // filter answers to only include non-empty answers, and make sure there is at least 1
         if (teamData[round] && teamData[round].filter((answer) => (answer !== '')).length > 0) {
@@ -31,7 +30,7 @@ class WaitingPage extends React.Component {
       });
 
       // we're done grading if every team that answered was graded
-      if (Object.keys(teams).length === Object.keys(graded)) {
+      if (Object.keys(teams).length === Object.keys(graded).length) {
         // restore teamsthat didn't answer anything this round
         const updatedTeams = game.teams;
         // check for a tiebreaker after round 3
@@ -61,7 +60,7 @@ class WaitingPage extends React.Component {
 
         // after setting standings, then go to the leaderboard/standings page
         // callback makes sure standings are set before we try to show them
-        this.firebase.setStandings(updatedTeams, this.state.round, () => {
+        this.firebase.setStandings(updatedTeams, round, () => {
           this.props.history.push('/host/standings');
         });
       }

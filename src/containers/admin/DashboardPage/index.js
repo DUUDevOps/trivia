@@ -127,15 +127,26 @@ class DashboardPage extends React.Component {
         </div>
 
         {this.state.isLiveGame ? (
-          <div
-            className={styles.liveGameButton}
-            role="button"
-            tabIndex={0}
-            onClick={this.loadLiveGame}
-          >
-            <div className={styles.liveGameText}>
-              resume live game
+          <div className={styles.liveGameContainer}>
+            <div
+              className={styles.liveGameButton}
+              role="button"
+              tabIndex={0}
+              onClick={this.loadLiveGame}
+            >
+              <div className={styles.liveGameText}>
+                resume live game
+              </div>
             </div>
+
+            <Link
+              className={styles.liveGameButton}
+              to="/host/grading"
+            >
+              <div className={styles.liveGameText}>
+                grading page
+              </div>
+            </Link>
           </div>
         ) : null}
 

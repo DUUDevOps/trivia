@@ -174,7 +174,7 @@ class Firebase {
       .then((snapshot) => {
         callback({ success: true, data: snapshot.val() });
       })
-      .catch(err => callback({ success: false }));
+      .catch((err) => callback({ success: false }));
   };
 
   /**
@@ -293,7 +293,7 @@ class Firebase {
    * @param {string} teamName
    */
   addGrading = (teamName) => {
-    this.liveGameRef.child('grading').push().set(teamName);
+    this.liveGameRef.child('grading').child(teamName).set(0);
   };
 
   /**
@@ -307,8 +307,8 @@ class Firebase {
     // inefficient, idc
     this.liveGameRef.child(`teams/${teamName}/score`).set(score).then(() => {
       // after setting the score, move from grading to graded
-      this.liveGameRef.child('grading').remove(teamName).then(() => {
-        this.liveGameRef.child('graded').push().set(teamName).then(callback);
+      this.liveGameRef.child(`grading/${teamName}`).remove().then(() => {
+        this.liveGameRef.child('graded').child(teamName).set(0).then(callback);
       });
     });
   };
