@@ -298,11 +298,18 @@ class Firebase {
 
   /**
    * remove a value from grading object and add it to graded
+   * also set it's score
    * @param {string} teamName
+   * @param {integer} score
+   * @param {function} callback
    */
-  moveToGraded = (teamName) => {
-    this.liveGameRef.child('grading').remove(teamName).then(() => {
-      this.liveGameRef.child('graded').push().set(teamName);
+  setGraded = (teamName, score, callback) => {
+    // inefficient, idc
+    this.liveGameRef.child(`teams/${teamName}/score`).set(score).then(() => {
+      // after setting the score, move from grading to graded
+      this.liveGameRef.child('grading').remove(teamName).then(() => {
+        this.liveGameRef.child('graded').push().set(teamName).then(callback);
+      });
     });
   };
 

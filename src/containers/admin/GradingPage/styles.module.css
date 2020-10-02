@@ -5,6 +5,45 @@
   left: 0;
 }
 
+.centerContainer {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-weight: bold;
+  font-size: 52px;
+  transform: translate(-50%, -50%);
+}
+
+.gradingButton {
+  margin: 35px auto 25px auto;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.7);
+  border-style: solid;
+  border-radius: 6px;
+  width: 180px;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  outline: none;
+  user-select: none;
+  cursor: pointer;
+  text-decoration: none;
+  background-color: #141e32;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24px;
+  transition: 200ms;
+}
+.gradingButton:hover {
+  font-weight: bold;
+  border-color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
 .header {
   font-weight: bold;
   font-size: 52px;
