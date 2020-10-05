@@ -15,6 +15,8 @@ class AnswerPage extends React.Component {
     this.state = {
       answers: [],
       stage: '',
+      hasBonus: false,
+      hasTiebreaker: false,
     };
 
     this.firebase = props.firebase;
@@ -58,7 +60,12 @@ class AnswerPage extends React.Component {
         }
       }
 
-      this.setState({ answers, stage });
+      this.setState({
+        answers,
+        stage,
+        hasBonus: game[game.stage][10].questionText,
+        hasTiebreaker: game[game.stage].length === 12 && game[game.stage][11].questionText,
+      });
     });
 
     // listen for the round to end
@@ -96,9 +103,9 @@ class AnswerPage extends React.Component {
 
         {this.state.answers.map((a, index) => (
           <div className={styles.answerContainer} key={index}>
-            {index === 11 ? (
+            {this.state.hasTiebreaker && index === (this.state.answers.length - 1) ? (
               <i className={classNames('fas fa-not-equal', styles.answerNum)} />
-            ) : index === 10 ? (
+            ) : index === (this.state.answers.length - (this.state.hasTiebreaker ? 2 : 1)) ? (
               <i className={classNames('fas fa-star', styles.answerNum)} />
             ) : (
               <div className={styles.answerNum}>

@@ -22,6 +22,7 @@ class GradingPage extends React.Component {
       teamScores: [],
       round: '',
       showQuestion: -1,
+      hasBonus: false,
     };
 
     this.firebase = props.firebase;
@@ -127,6 +128,7 @@ class GradingPage extends React.Component {
         teamName,
         teamScores,
         round,
+        hasBonus: game[round][10].questionText,
       }, () => {
         // select the first input after each question
         const input = document.getElementById(FIRST_ELEMENT_ID);

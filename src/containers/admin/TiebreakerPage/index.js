@@ -77,8 +77,8 @@ class GradingPage extends React.Component {
 
         this.setState({
           // filter out no bonus
-          // the tiebreaker is from the second round, 12 question (12 - 1 = 11th index)
-          question: game.round2[11],
+          // the tiebreaker is from the second round, last question
+          question: game.round2[game.round2.length - 1],
           teams: tiedTeams,
           teamNames: Object.keys(tiedTeams),
           currentTeamNum: 0,
@@ -215,8 +215,8 @@ class GradingPage extends React.Component {
               </div>
               <div className={styles.answer} style={{ marginLeft: '5vw' }}>
                 {this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2
-                  && this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[11]
-                    ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[11] : 'no answer'}
+                  && this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2.length - 1]
+                    ? this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2[this.state.teams[this.state.teamNames[this.state.currentTeamNum]].round2.length - 1] : 'no answer'}
               </div>
 
               <div className={styles.pointsContainer}>

@@ -17,6 +17,8 @@ class HostQuestionPage extends React.Component {
       roundNum: 1,
       question: {},
       questions: [],
+      hasBonus: false,
+      hasTiebreaker: false,
     };
 
     this.firebase = props.firebase;
@@ -46,6 +48,8 @@ class HostQuestionPage extends React.Component {
         question: questions[this.state.qnum - 1],
         questions,
         roundNum: game.stage.substring(game.stage.length - 1, game.stage.length),
+        hasBonus: game[game.stage][10].questionText,
+        hasTiebreaker: game[game.stage].length === 12 && game[game.stage][11].questionText,
       });
     });
   }
@@ -82,7 +86,8 @@ class HostQuestionPage extends React.Component {
         <img src={DukeNiteLogo} alt="Duke@Nite Logo" className={styles.logo} draggable={false} />
         <div className={styles.header}>
           {`round ${this.state.roundNum}: `}
-          {this.state.qnum === 12 ? 'tiebreaker' : this.state.qnum === 11 ? 'bonus question' : `question ${this.state.qnum}`}
+          {this.state.hasTiebreaker && this.state.qnum === this.state.questions.length ? 'tiebreaker'
+            : this.state.qnum === (this.state.questions.length - (this.state.hasTiebreaker ? 1 : 0)) ? 'bonus question' : `question ${this.state.qnum}`}
         </div>
 
         <div className={styles.questionContainer}>
