@@ -16,6 +16,21 @@
   100% { opacity: 1 }
 }
 
+.downloadButton {
+  font-size: 14px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  opacity: 0.7;
+  transition: 200ms;
+}
+.downloadButton:hover {
+  opacity: 1;
+}
+
 .headerRow {
   width: 90vw;
   min-width: 300px;

@@ -4,6 +4,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { Textfit } from 'react-textfit';
 import classNames from 'classnames';
 import ReactTooltip from 'react-tooltip';
+import zipcelx from 'zipcelx';
 
 import styles from './styles.module.css';
 import DukeNiteLogo from '../../../assets/DukeNiteLogo.png';
@@ -24,15 +25,19 @@ class StandingsPage extends React.Component {
 
     this.firebase = props.firebase;
     this.round = '';
+    this.game = {};
+    this.standings = [];
 
     this.nextRound = this.nextRound.bind(this);
     this.reveal = this.reveal.bind(this);
+    this.downloadResults = this.downloadResults.bind(this);
   }
 
   componentDidMount() {
     this.firebase.getGame((res) => {
       if (!res.success || !res.data) return;
       const game = res.data;
+      this.game = game;
       // remove teams without scores
       const teams = {};
       Object.entries(game.teams).forEach(([teamName, teamData]) => {
@@ -59,6 +64,7 @@ class StandingsPage extends React.Component {
         }
         standings[i].place = place;
       }
+      this.standings = standings;
 
       // the size of the standings holder
       const holderHeight = viewportToPixels('95vh') - 125;
@@ -98,6 +104,45 @@ class StandingsPage extends React.Component {
     });
   }
 
+  downloadResults() {
+    // create an excel file and download it
+    // need to get the quiz for it's name
+    this.firebase.getQuiz(this.game.quizId, (res) => {
+      if (res.success) {
+        // initate the data file with some basic columns
+        const data = [
+          [{
+            value: 'Team Name',
+          }, {
+            value: 'NetIDs',
+          }, {
+            value: 'Score',
+          }],
+        ];
+
+        // add a row for each team
+        this.standings.forEach((standing) => {
+          data.push([{
+            value: standing.name,
+          }, {
+            value: getIdsText(standing.ids),
+          }, {
+            value: standing.score,
+          }]);
+        });
+
+        // name the file after the set's name and the start date
+        const config = {
+          filename: `${res.data.name} - ${this.game.date}`,
+          sheet: { data },
+        };
+
+        // this call creates and downloads the file
+        zipcelx(config);
+      }
+    });
+  }
+
   render() {
     // not really supported on mobile
 
@@ -115,6 +160,12 @@ class StandingsPage extends React.Component {
             <img src={DukeNiteLogo} alt="Duke@Nite" className={styles.headerLogo} />
           )}
         </div>
+
+        {this.state.stage === 'final standings' ? (
+          <div className={styles.downloadButton} role="button" tabIndex={0} onClick={this.downloadResults}>
+            download
+          </div>
+        ) : null}
 
         <div className={styles.divider} style={{ width: '90vw' }} />
 
