@@ -134,7 +134,13 @@ class StandingPage extends React.Component {
           the host has the final standings
         </div>
       </div>
-    ) : null;
+    ) : (
+      <div className={styles.container}>
+        <div className={styles.placeText}>
+          waiting
+        </div>
+      </div>
+    );
   }
 }
 

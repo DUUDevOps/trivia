@@ -40,7 +40,7 @@ class GradingPage extends React.Component {
       // only do something when the stage changes
       if (stage === snapshot.val().stage) return;
       stage = snapshot.val().stage;
-      if (stage.includes('grading')) {
+      if (stage.includes('grading') && !stage.includes('tie')) {
         // give some time for players to submit questions
         this.timeout = setTimeout(() => {
           this.setState({ canGrade: true });

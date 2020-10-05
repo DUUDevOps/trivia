@@ -27,7 +27,7 @@ class WaitingPage extends React.Component {
       const stage = snapshot.val().stage;
       if (['round1', 'round2', 'round3'].includes(stage)) {
         this.props.history.push('/play/answer');
-      } else if (stage.includes('-') && stage.split('-')[1].includes('standings')) {
+      } else if (stage.includes('-') && stage.split('-')[1].includes('standings') && !stage.includes('tie')) {
         this.props.history.push('/play/standing');
       }
     });

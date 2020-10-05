@@ -50,9 +50,9 @@ class WaitingPage extends React.Component {
                 isTie = true;
               }
             });
-            // if there is a tie, keep the same round, update the teams, and go to tiebreaker page
+            // if there is a tie, set tiebreaker round, update the teams, and go to tiebreaker page
             if (isTie) {
-              this.firebase.setStandings(updatedTeams, 'round3-grading', () => {
+              this.firebase.setStandings(updatedTeams, 'round3-grading-tie', () => {
                 this.props.history.push('/host/tiebreaker');
               });
               // return stops us from going to standings below
