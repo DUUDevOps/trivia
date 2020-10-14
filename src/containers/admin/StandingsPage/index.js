@@ -53,6 +53,8 @@ class StandingsPage extends React.Component {
         place: 1,
       }));
 
+      if (standings.length === 0) return;
+
       // sort the array by score
       standings.sort((a, b) => (b.score - a.score));
 
@@ -67,9 +69,10 @@ class StandingsPage extends React.Component {
       this.standings = standings;
 
       // the size of the standings holder
-      const holderHeight = viewportToPixels('95vh') - 125;
+      const holderHeight = viewportToPixels('92.5vh') - 125;
       // 83 px is size of standing, * 2 for 2 columns
       const maxTeams = Math.floor(holderHeight / 83) * 2;
+      console.log(maxTeams);
       // either show as many as we can fix or all the standings
       const teamsToDisplay = Math.min(maxTeams, standings.length);
 
@@ -97,7 +100,22 @@ class StandingsPage extends React.Component {
   }
 
   reveal() {
-    this.setState({ numberToReveal: this.state.numberToReveal - 1 }, () => {
+    // we don't care about the standings we're not revealing, so filter them out
+    // (can't just remove them though because we need them for the download I think)
+    const standings = this.state.standings.filter((s, i) => (i < this.state.teamsToDisplay));
+    // get what place we are currently on and subtract one to get the next place to reveal
+    const nextPlace = standings[this.state.numberToReveal - 1].place;
+    // we reveal tied teams together, so see how many teams are tied
+    let numberTied = 0;
+    // the number of tied teams is found by going through every team to be displayed and seeing how
+    // many have the same place, which is the next place we are revealing
+    standings.forEach((standing) => {
+      if (standing.place === nextPlace) {
+        numberTied += 1;
+      }
+    })
+
+    this.setState({ numberToReveal: this.state.numberToReveal - numberTied }, () => {
       if (this.state.numberToReveal <= 0) {
         this.firebase.setStage('finished');
       }
