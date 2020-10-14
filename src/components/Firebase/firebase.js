@@ -301,14 +301,18 @@ class Firebase {
    * also set it's score
    * @param {string} teamName
    * @param {integer} score
+   * @param {object} teamScores
+   * @param {string} round
    * @param {function} callback
    */
-  setGraded = (teamName, score, callback) => {
+  setGraded = (teamName, score, teamScores, round, callback) => {
     // inefficient, idc
     this.liveGameRef.child(`teams/${teamName}/score`).set(score).then(() => {
-      // after setting the score, move from grading to graded
-      this.liveGameRef.child(`grading/${teamName}`).remove().then(() => {
-        this.liveGameRef.child('graded').child(teamName).set(0).then(callback);
+      this.liveGameRef.child(`teams/${teamName}/${round}-scores`).set(teamScores).then(() => {
+        // after setting the score, move from grading to graded
+        this.liveGameRef.child(`grading/${teamName}`).remove().then(() => {
+          this.liveGameRef.child('graded').child(teamName).set(0).then(callback);
+        });
       });
     });
   };

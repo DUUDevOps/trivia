@@ -152,7 +152,7 @@ class GradingPage extends React.Component {
     let score = this.state.team.score || 0;
     score += this.state.teamScores.reduce((accumulator, currentValue) => (accumulator + currentValue));
     // save the score in firebase
-    this.firebase.setGraded(this.state.teamName, score, () => {
+    this.firebase.setGraded(this.state.teamName, score, this.state.teamScores, this.state.round, () => {
       this.setState({
         teamName: '',
         team: {},
