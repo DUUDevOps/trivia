@@ -57,7 +57,7 @@ PopUp.propTypes = {
     onClick: PropTypes.func,
   }),
   loading: PropTypes.bool,
-  inputValue: PropTypes.string,
+  inputValue: PropTypes.any,
   inputChange: PropTypes.func,
   inputPlaceholder: PropTypes.string,
 };

@@ -318,6 +318,22 @@ class Firebase {
   };
 
   /**
+   * change the points for a question and thus the overall score too
+   * @param {string} teamName
+   * @param {string} round
+   * @param {integer} question
+   * @param {integer} newPoints
+   * @param {integer} newScore
+   * @param {function} callback
+   */
+  changeScore = (teamName, round, question, newPoints, newScore, callback) => {
+    // change the particular question points
+    this.liveGameRef.child(`teams/${teamName}/${round}-scores/${question}`).set(newPoints).then(() => {
+      this.liveGameRef.child(`teams/${teamName}/score`).set(newScore).then(callback);
+    });
+  };
+
+  /**
   * upload a image to firebase storage and get the url
   * @param {string} imageUrl
   * @param {function} callback

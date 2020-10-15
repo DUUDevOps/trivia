@@ -23,6 +23,7 @@ import HostWaitingPage from './containers/admin/WaitingPage';
 import GradingPage from './containers/admin/GradingPage';
 import HostStandingsPage from './containers/admin/StandingsPage';
 import HostTiebreakerPage from './containers/admin/TiebreakerPage';
+import HostMasterPage from './containers/admin/MasterPage';
 
 ReactDOM.render(
   <FirebaseContext.Provider value={new Firebase()}>
@@ -42,6 +43,7 @@ ReactDOM.render(
         <AdminRoute exact path="/host/grading" component={GradingPage} />
         <AdminRoute exact path="/host/standings" component={HostStandingsPage} />
         <AdminRoute exact path="/host/tiebreaker" component={HostTiebreakerPage} />
+        <AdminRoute exact path="/host/master" component={HostMasterPage} />
         <Route component={HomePage} />
       </Switch>
     </BrowserRouter>
