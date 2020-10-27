@@ -72,7 +72,7 @@
   border-color: #fff;
   border-style: dashed;
   border-radius: 0px;
-  width: 40%;
+  width: 30%;
   cursor: pointer;
   outline: none;
   text-decoration: none;
@@ -152,7 +152,7 @@
   transform: scale(0.95);
 }
 
-@media only screen and (max-width: 450px) {
+@media only screen and (max-width: 600px) {
   .createContainer {
     width: calc(310px - 46px);
     margin: 25px auto;

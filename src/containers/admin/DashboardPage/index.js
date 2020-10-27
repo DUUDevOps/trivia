@@ -147,6 +147,15 @@ class DashboardPage extends React.Component {
                 grading page
               </div>
             </Link>
+
+            <Link
+              className={styles.liveGameButton}
+              to="/host/master"
+            >
+              <div className={styles.liveGameText}>
+                master page
+              </div>
+            </Link>
           </div>
         ) : null}
 

@@ -13,7 +13,7 @@ class GradingPage extends React.Component {
 
     this.state = {
       stage: '',
-      teams: [],
+      teams: {},
       rounds: [],
       selectedRound: 'round1',
       showPopUp: false,
@@ -47,7 +47,7 @@ class GradingPage extends React.Component {
       const game = res.data;
       this.setState({
         stage: game.stage,
-        teams: game.teams,
+        teams: game.teams || {},
         rounds: {
           round1: game.round1,
           round2: game.round2,
@@ -104,7 +104,7 @@ class GradingPage extends React.Component {
 
         <div className={styles.lowerContainer}>
           <div className={styles.teamsColumn}>
-            {Object.keys(this.state.teams).map((teamName, index) => (
+            {this.state.teams ? Object.keys(this.state.teams).map((teamName, index) => (
               <div key={teamName}>
                 <div
                   className={classNames(styles.teamBox, { [styles.selectedTeam]: this.state.selectedTeam === teamName })}
@@ -117,7 +117,7 @@ class GradingPage extends React.Component {
 
                 <div className={styles.divider} />
               </div>
-            ))}
+            )) : null}
           </div>
 
           <div className={styles.bottomRight}>
@@ -163,42 +163,43 @@ class GradingPage extends React.Component {
             <div className={styles.divider} />
 
             {this.state.selectedTeam && Object.keys(this.state.teams[this.state.selectedTeam]).includes(this.state.selectedRound)
-              ? this.state.teams[this.state.selectedTeam][this.state.selectedRound].filter((a, index) =>
-                (this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index] !== undefined)).map((teamAnswers, index) => (
-              <div key={index}>
-                <div className={styles.teamAnswerRow}>
-                  <div className={styles.answerText}>
-                    {this.state.rounds[this.state.selectedRound][index].answer}
+              && Object.keys(this.state.teams[this.state.selectedTeam]).includes(`${this.state.selectedRound}-scores`)
+              ? this.state.teams[this.state.selectedTeam][this.state.selectedRound].map((teamAnswers, index) =>
+              this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index] !== undefined ? (
+                <div key={index}>
+                  <div className={styles.teamAnswerRow}>
+                    <div className={styles.answerText}>
+                      {this.state.rounds[this.state.selectedRound].filter((q) => (q.questionText))[index].answer}
+                    </div>
+
+                    <div className={styles.answerText}>
+                      {this.state.teams[this.state.selectedTeam][this.state.selectedRound][index]}
+                    </div>
+
+                    <div className={styles.answerText}>
+                      {`${this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index]}/${this.state.rounds[this.state.selectedRound][index].points}`}
+                    </div>
+
+                    <div
+                      className={styles.editButton}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => this.setState({
+                        pointsText: this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index],
+                        pointsQuestion: index,
+                        showPopUp: true,
+                        loading: false,
+                      })}
+                    >
+                      edit
+                    </div>
                   </div>
 
-                  <div className={styles.answerText}>
-                    {this.state.teams[this.state.selectedTeam][this.state.selectedRound][index]}
-                  </div>
-
-                  <div className={styles.answerText}>
-                    {`${this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index]}/${this.state.rounds[this.state.selectedRound][index].points}`}
-                  </div>
-
-                  <div
-                    className={styles.editButton}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => this.setState({
-                      pointsText: this.state.teams[this.state.selectedTeam][`${this.state.selectedRound}-scores`][index],
-                      pointsQuestion: index,
-                      showPopUp: true,
-                      loading: false,
-                    })}
-                  >
-                    edit
-                  </div>
+                  {index !== this.state.teams[this.state.selectedTeam][this.state.selectedRound].length - 1 ? (
+                    <div className={styles.divider} />
+                  ) : null}
                 </div>
-
-                {index !== this.state.teams[this.state.selectedTeam][this.state.selectedRound].length - 1 ? (
-                  <div className={styles.divider} />
-                ) : null}
-              </div>
-            )) : this.state.selectedTeam ? (
+            ) : null) : this.state.selectedTeam ? (
               <div className={styles.nothingText}>
                 no answers for this round yet
               </div>
