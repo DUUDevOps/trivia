@@ -33,10 +33,6 @@ class GradingPage extends React.Component {
     this.refresh();
   }
 
-  componentWillUnmount() {
-    this.dbRef.off('value');
-  }
-
   refresh() {
     if (this.loading) return;
     this.loading = true;

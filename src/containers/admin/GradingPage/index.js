@@ -67,7 +67,9 @@ class GradingPage extends React.Component {
   componentWillUnmount() {
     // have to clear every timeout we use just in case it doesn't finish
     clearTimeout(this.timeout);
-    this.dbRef.off('value');
+    if (Object.keys(this.dbRef).length) {
+      this.dbRef.off('value');
+    }
   }
 
   getResponses() {

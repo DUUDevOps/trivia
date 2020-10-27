@@ -35,7 +35,9 @@ class WaitingPage extends React.Component {
 
   componentWillUnmount() {
     // stop listening so we don't try to update this page when we're not here
-    this.dbRef.off('value');
+    if (Object.keys(this.dbRef).length) {
+      this.dbRef.off('value');
+    }
   }
 
   changeExcuse() {

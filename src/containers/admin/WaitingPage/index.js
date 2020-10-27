@@ -71,7 +71,9 @@ class WaitingPage extends React.Component {
   }
 
   componentWillUnmount() {
-    this.dbRef.off('value');
+    if (Object.keys(this.dbRef).length) {
+      this.dbRef.off('value');
+    }
     clearTimeout(this.timeout);
   }
 
