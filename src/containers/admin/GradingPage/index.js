@@ -118,9 +118,13 @@ class GradingPage extends React.Component {
       const questions = game[round].filter((question, index) => (question.questionText !== '' && index !== TIEBREAKER_INDEX));
       // mark questions that are an exact match as correct
       questions.forEach((q, i) => {
-        if (game.teams[teamName][round][i].toLowerCase().trim() === q.answer.toLowerCase().trim()) {
-          teamScores[i] = q.points;
-        }
+        // if answer separated by ; then it's one of multiple answers that work
+        const ans = q.answer.split('; ')
+        ans.forEach((word) => {
+          if (game.teams[teamName][round][i].toLowerCase().trim() === word.toLowerCase().trim()) {
+            teamScores[i] = q.points;
+          }
+        })
       });
 
       // set the state with the new data
